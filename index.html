@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoe was het om je huis te openen? – Takecarebnb</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+  /* ── Aanpassen als het lettertype anders blijkt te zijn ── */
+  :root {
+    --bg: #FFF5E4;
+    --ink: #004542;
+    --ink-soft: rgba(0, 69, 66, 0.62);
+    --line: rgba(0, 69, 66, 0.22);
+    --field: #FFFBF3;
+    --font: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px 24px 64px;
+  }
+
+  h1 {
+    font-weight: 800;
+    font-size: clamp(30px, 6vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 0 0 20px;
+  }
+  .intro p { margin: 0 0 14px; }
+  .intro .meta {
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  form { margin-top: 36px; }
+
+  /* Elke vraag krijgt een nummer in de marge: het is echt een reeks van 9 */
+  .q {
+    position: relative;
+    padding: 28px 0 28px 0;
+    border-top: 1px solid var(--line);
+  }
+  .q:last-of-type { border-bottom: 1px solid var(--line); }
+  .q-num {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .q-label {
+    display: block;
+    font-weight: 800;
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 0 0 6px;
+  }
+  .q-help {
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 0 0 14px;
+  }
+  .q-label + .options, .q-label + textarea, .q-label + .yesno { margin-top: 14px; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .options label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 14px;
+    background: var(--field);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .options label:hover { border-color: var(--ink); }
+  .options input { margin: 5px 0 0; accent-color: var(--ink); flex: 0 0 auto; width: 18px; height: 18px; }
+  .options label:has(input:checked) { border-color: var(--ink); background: #fff; }
+  .options label:has(input:focus-visible) { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  textarea, input[type="text"], input[type="email"] {
+    width: 100%;
+    font: inherit;
+    color: var(--ink);
+    background: var(--field);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  textarea { min-height: 120px; resize: vertical; }
+  textarea:focus, input:focus { outline: 3px solid var(--ink); outline-offset: 2px; border-color: var(--ink); }
+  input[type="email"] { margin-top: 12px; }
+
+  .counter { font-size: 13px; color: var(--ink-soft); margin-top: 6px; text-align: right; }
+  .counter.full { color: #a33a20; }
+
+  .error { display: none; color: #a33a20; font-size: 14px; margin-top: 8px; }
+  .q.invalid .error { display: block; }
+  .q.invalid textarea, .q.invalid .options label { border-color: #a33a20; }
+
+  .submit-row { margin-top: 32px; display: flex; flex-direction: column; gap: 14px; }
+  button[type="submit"] {
+    align-self: flex-start;
+    font: inherit;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--bg);
+    background: var(--ink);
+    border: 0;
+    border-radius: 999px;
+    padding: 15px 30px;
+    cursor: pointer;
+    transition: transform .12s;
+  }
+  button[type="submit"]:hover { transform: translateY(-1px); }
+  button[type="submit"]:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .privacy { font-size: 14px; color: var(--ink-soft); margin: 0; }
+
+  .thanks { display: none; }
+  .thanks h1 { margin-bottom: 12px; }
+  body.done form, body.done .intro { display: none; }
+  body.done .thanks { display: block; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="intro">
+    <h1>Hoe was het om je huis te openen?</h1>
+    <p>Jij hebt gedaan wat de meeste mensen alleen overwegen. Daarom willen we jouw verhaal horen. Wat maakte je aan het twijfelen, wat gebeurde er echt, en wat zeg je tegen iemand die nog aarzelt?</p>
+    <p>We gebruiken je antwoorden om nieuwe gastgezinnen te vinden. En om zelf beter te worden. Dus ook wat niet goed ging horen we graag. Daar leren we het meest van.</p>
+    <p class="meta">Negen vragen, vijf minuten. Je antwoorden delen we alleen met jouw toestemming.</p>
+  </div>
+
+  <!--
+    VERSTUREN: zet hieronder je eigen endpoint in `action`.
+    Werkt met Formspree (https://formspree.io/f/XXXX), Netlify Forms, Make/Zapier webhook, of een eigen script.
+    Het formulier post als JSON via fetch; valt terug op een gewone POST als JS uit staat.
+  -->
+  <form id="survey" action="https://formspree.io/f/VUL-IN" method="POST" novalidate>
+
+    <div class="q">
+      <span class="q-num">VRAAG 1 VAN 9</span>
+      <span class="q-label">Hoe vaak ben je gastgezin geweest?</span>
+      <div class="options" role="radiogroup">
+        <label><input type="radio" name="aantal_keer" value="Eén keer" required> Eén keer</label>
+        <label><input type="radio" name="aantal_keer" value="Twee of drie keer"> Twee of drie keer</label>
+        <label><input type="radio" name="aantal_keer" value="Vaker"> Vaker</label>
+        <label><input type="radio" name="aantal_keer" value="Ingeschreven, nog geen gast gehad"> Ik sta ingeschreven, maar heb nog geen gast gehad</label>
+      </div>
+      <p class="error">Kies één antwoord.</p>
+    </div>
+
+    <div class="q">
+      <span class="q-num">VRAAG 2 VAN 9</span>
+      <label class="q-label" for="doorslag">Wat gaf de doorslag om je in te schrijven?</label>
+      <textarea id="doorslag" name="doorslag" required></textarea>
+      <p class="error">Dit antwoord hebben we nodig.</p>
+    </div>
+
+    <div class="q">
+      <span class="q-num">VRAAG 3 VAN 9</span>
+      <label class="q-label" for="twijfel">Wat was vooraf je grootste twijfel? En wat gebeurde er in werkelijkheid?</label>
+      <textarea id="twijfel" name="twijfel" required></textarea>
+      <p class="error">Dit antwoord hebben we nodig.</p>
+    </div>
+
+    <div class="q" data-max="3">
+      <span class="q-num">VRAAG 4 VAN 9</span>
+      <span class="q-label">Wat heeft het logeren jou en je gezin gebracht?</span>
+      <p class="q-help">Kies er maximaal drie.</p>
+      <div class="options">
+        <label><input type="checkbox" name="gebracht" value="Een band die er nog steeds is"> Een band die er nog steeds is</label>
+        <label><input type="checkbox" name="gebracht" value="Een andere kijk op vluchtelingen en het nieuws"> Een andere kijk op vluchtelingen en het nieuws</label>
+        <label><input type="checkbox" name="gebracht" value="Onze kinderen hebben er iets van geleerd"> Onze kinderen hebben er iets van geleerd</label>
+        <label><input type="checkbox" name="gebracht" value="Het gevoel dat we iets concreets konden doen"> Het gevoel dat we iets concreets konden doen</label>
+        <label><input type="checkbox" name="gebracht" value="Een kijkje in een andere cultuur, aan onze eigen tafel"> Een kijkje in een andere cultuur, aan onze eigen tafel</label>
+        <label><input type="checkbox" name="gebracht" value="Nieuwe mensen in ons netwerk"> Nieuwe mensen in ons netwerk</label>
+        <label><input type="checkbox" name="gebracht" value="Eerlijk gezegd vooral gedoe"> Eerlijk gezegd vooral gedoe</label>
+      </div>
+      <p class="error">Kies minimaal één en maximaal drie antwoorden.</p>
+    </div>
+
+    <div class="q">
+      <span class="q-num">VRAAG 5 VAN 9</span>
+      <label class="q-label" for="mooiste">Wat was het mooiste moment?</label>
+      <textarea id="mooiste" name="mooiste_moment" required></textarea>
+      <p class="error">Dit antwoord hebben we nodig.</p>
+    </div>
+
+    <div class="q">
+      <span class="q-num">VRAAG 6 VAN 9</span>
+      <label class="q-label" for="beter">Wat had beter gekund?</label>
+      <p class="q-help">Bij Takecarebnb, of in het logeren zelf. Wees gerust eerlijk.</p>
+      <textarea id="beter" name="beter_gekund" required></textarea>
+      <p class="error">Dit antwoord hebben we nodig.</p>
+    </div>
+
+    <div class="q">
+      <span class="q-num">VRAAG 7 VAN 9</span>
+      <label class="q-label" for="vriend">Een vriend zegt: “Een vluchteling in huis? Dat is toch niks voor gewone mensen.” Wat zeg jij dan?</label>
+      <textarea id="vriend" name="reactie_vriend" required></textarea>
+      <p class="error">Dit antwoord hebben we nodig.</p>
+    </div>
+
+    <div class="q">
+      <span class="q-num">VRAAG 8 VAN 9</span>
+      <label class="q-label" for="eenzin">Als je één zin mocht zeggen tegen iemand die twijfelt, welke zin is dat?</label>
+      <textarea id="eenzin" name="een_zin" maxlength="160" required style="min-height:80px"></textarea>
+      <div class="counter" data-for="eenzin">0 / 160</div>
+      <p class="error">Dit antwoord hebben we nodig.</p>
+    </div>
+
+    <div class="q">
+      <span class="q-num">VRAAG 9 VAN 9</span>
+      <span class="q-label">Mogen we contact opnemen om je verhaal te delen?</span>
+      <div class="options" role="radiogroup">
+        <label><input type="radio" name="contact" value="Ja" required> Ja, graag</label>
+        <label><input type="radio" name="contact" value="Ja, anoniem"> Ja, maar anoniem</label>
+        <label><input type="radio" name="contact" value="Nee"> Nee</label>
+      </div>
+      <input type="email" id="email" name="email" placeholder="Je e-mailadres" aria-label="Je e-mailadres" hidden>
+      <p class="error">Kies één antwoord en vul je e-mailadres in als je ja zegt.</p>
+    </div>
+
+    <!-- honeypot tegen spam -->
+    <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+    <div class="submit-row">
+      <button type="submit">Verstuur mijn antwoorden</button>
+      <p class="privacy">Je antwoorden gebruiken we alleen voor dit onderzoek. Niets wordt gedeeld zonder jouw toestemming.</p>
+    </div>
+  </form>
+
+  <div class="thanks">
+    <h1>Dank je wel.</h1>
+    <p>Jouw verhaal helpt het volgende gastgezin over de drempel. Als je ja hebt gezegd op de laatste vraag, hoor je binnenkort van ons.</p>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var form = document.getElementById('survey');
+  var email = document.getElementById('email');
+
+  // E-mailveld tonen bij "ja"
+  form.querySelectorAll('input[name="contact"]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      var show = r.value.indexOf('Ja') === 0;
+      email.hidden = !show;
+      email.required = show;
+      if (show) email.focus();
+    });
+  });
+
+  // Max 3 bij vraag 4
+  form.querySelectorAll('.q[data-max]').forEach(function (q) {
+    var max = +q.dataset.max;
+    var boxes = q.querySelectorAll('input[type="checkbox"]');
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        var n = q.querySelectorAll('input:checked').length;
+        boxes.forEach(function (o) { o.disabled = !o.checked && n >= max; });
+      });
+    });
+  });
+
+  // Teller bij vraag 8
+  form.querySelectorAll('.counter').forEach(function (c) {
+    var t = document.getElementById(c.dataset.for);
+    var upd = function () {
+      c.textContent = t.value.length + ' / ' + t.maxLength;
+      c.classList.toggle('full', t.value.length >= t.maxLength);
+    };
+    t.addEventListener('input', upd); upd();
+  });
+
+  function validate() {
+    var ok = true, first = null;
+    form.querySelectorAll('.q').forEach(function (q) {
+      var valid = true;
+      var ta = q.querySelector('textarea');
+      var radios = q.querySelectorAll('input[type="radio"]');
+      var checks = q.querySelectorAll('input[type="checkbox"]');
+      if (ta && ta.required && !ta.value.trim()) valid = false;
+      if (radios.length && !q.querySelector('input[type="radio"]:checked')) valid = false;
+      if (checks.length) {
+        var n = q.querySelectorAll('input[type="checkbox"]:checked').length;
+        if (n < 1 || n > +q.dataset.max) valid = false;
+      }
+      if (q.contains(email) && email.required && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)) valid = false;
+      q.classList.toggle('invalid', !valid);
+      if (!valid) { ok = false; first = first || q; }
+    });
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return ok;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!validate()) return;
+    var fd = new FormData(form);
+    var data = {};
+    fd.forEach(function (v, k) { data[k] = data[k] ? data[k] + '; ' + v : v; });
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.textContent = 'Versturen…';
+
+    // Preview-modus: zolang er geen endpoint is ingevuld, alleen het bedankscherm tonen
+    if (form.action.indexOf('VUL-IN') !== -1) {
+      document.body.classList.add('done');
+      window.scrollTo({ top: 0 });
+      return;
+    }
+
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      document.body.classList.add('done');
+      window.scrollTo({ top: 0 });
+      // hoogte doorgeven aan de ouderpagina (optioneel, zie uitleg)
+      if (window.parent !== window) window.parent.postMessage({ tcbnbHeight: document.body.scrollHeight }, '*');
+    }).catch(function () {
+      btn.disabled = false; btn.textContent = 'Verstuur mijn antwoorden';
+      alert('Versturen lukte niet. Probeer het nog een keer, of mail je antwoorden naar info@takecarebnb.org.');
+    });
+  });
+
+  // Hoogte doorgeven zodat de iframe meegroeit
+  function sendHeight() {
+    if (window.parent !== window) window.parent.postMessage({ tcbnbHeight: document.body.scrollHeight }, '*');
+  }
+  window.addEventListener('load', sendHeight);
+  window.addEventListener('resize', sendHeight);
+  new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true, attributes: true });
+})();
+</script>
+</body>
+</html>
