@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoe gastvrij ben jij? – Takecarebnb</title>
+<meta property="og:title" content="Hoe gastvrij ben jij?">
+<meta property="og:description" content="Acht vragen, één profiel. Ontdek wat voor gastgezin jij zou zijn.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF5E4;
+    --ink: #004542;
+    --ink-soft: rgba(0, 69, 66, 0.62);
+    --line: rgba(0, 69, 66, 0.22);
+    --field: #FFFBF3;
+    --font: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* voortgang: een balk die vult, geen nummers */
+  .progress { position: fixed; top: 0; left: 0; right: 0; height: 5px; background: var(--line); z-index: 10; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .35s ease; }
+
+  .stage { max-width: 620px; margin: 0 auto; padding: 56px 24px 64px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+  .screen { display: none; animation: in .3s ease both; }
+  .screen.active { display: block; }
+  @keyframes in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  h1 { font-weight: 800; font-size: clamp(32px, 7vw, 52px); line-height: 1.02; letter-spacing: -0.01em; margin: 0 0 18px; }
+  h2 { font-weight: 800; font-size: clamp(22px, 4.6vw, 30px); line-height: 1.2; margin: 0 0 24px; }
+  p { margin: 0 0 14px; }
+  .soft { color: var(--ink-soft); font-size: 15px; }
+  .eyebrow { display: block; font-size: 13px; font-weight: 500; letter-spacing: .08em; color: var(--ink-soft); margin-bottom: 10px; text-transform: uppercase; }
+
+  .btn {
+    display: inline-block; font: inherit; font-weight: 800; font-size: 18px;
+    color: var(--bg); background: var(--ink); border: 0; border-radius: 999px;
+    padding: 15px 30px; cursor: pointer; text-decoration: none; transition: transform .12s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--ink); }
+  .btn:disabled { opacity: .55; cursor: default; transform: none; }
+
+  .answers { display: flex; flex-direction: column; gap: 10px; }
+  .answers button {
+    font: inherit; text-align: left; color: var(--ink);
+    background: var(--field); border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 15px 18px 15px 54px; cursor: pointer; position: relative;
+    transition: border-color .15s, background .15s, transform .12s;
+  }
+  .answers button .key {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 28px; height: 28px; border: 1.5px solid var(--line); border-radius: 7px;
+    font-size: 13px; font-weight: 800; display: grid; place-items: center; background: #fff;
+  }
+  .answers button:hover, .answers button:focus-visible { border-color: var(--ink); background: #fff; outline: none; }
+  .answers button.picked { border-color: var(--ink); background: #fff; transform: scale(.99); }
+  .answers button.picked .key { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .nav { display: flex; align-items: center; gap: 18px; margin-top: 26px; }
+  .back { font: inherit; background: none; border: 0; color: var(--ink-soft); cursor: pointer; padding: 0; text-decoration: underline; }
+
+  label.f { display: block; margin-bottom: 14px; }
+  label.f span { display: block; font-weight: 500; margin-bottom: 6px; }
+  input[type="text"], input[type="email"], input[type="tel"] {
+    width: 100%; font: inherit; color: var(--ink); background: var(--field);
+    border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  }
+  input:focus { outline: 3px solid var(--ink); outline-offset: 2px; border-color: var(--ink); }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; margin: 6px 0 20px; }
+  .check input { accent-color: var(--ink); width: 18px; height: 18px; margin-top: 3px; flex: 0 0 auto; }
+  .err { color: #a33a20; font-size: 14px; margin-top: 8px; display: none; }
+  .err.show { display: block; }
+
+  /* resultaat */
+  .profile-name { font-size: clamp(38px, 9vw, 64px); line-height: .98; }
+  .quote { border-left: 3px solid var(--ink); padding: 6px 0 6px 18px; margin: 26px 0; font-size: 18px; }
+  .quote cite { display: block; font-style: normal; font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .share { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+
+  @media (prefers-reduced-motion: reduce) { *, .screen { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+<main class="stage" id="stage"></main>
+
+<script>
+/* ────────────────────────────────────────────────────────────────
+   INSTELLINGEN
+   - ENDPOINT: waar de lead naartoe gaat (Formspree, Make, Zapier, eigen script).
+     Zolang hier 'VUL-IN' in staat, draait de quiz in preview-modus en wordt niets verzonden.
+   - LINKS: de drie knoppen na het resultaat.
+   - Citaten in PROFILES zijn placeholders; vul ze in vanuit het gastgezinnen-onderzoek (vraag 3 en 8).
+──────────────────────────────────────────────────────────────── */
+var ENDPOINT = 'https://formspree.io/f/VUL-IN';
+var LINKS = {
+  inschrijven: 'https://takecarebnb.org/inschrijven-gastgezinnen/',
+  folder: 'http://takecarebnb.org/aanvragen-informatiefolder/',
+  vragenuur: 'http://takecarebnb.org/vragenuur-voor-gastgezinnen/'
+};
+
+var PROFILES = {
+  K: {
+    name: 'De Keukentafel',
+    lead: 'Bij jou schuift iedereen aan. Een extra bord is nooit een probleem, en het beste gesprek voer je met een pan op tafel.',
+    fit: 'Logeren past bij jou omdat je niets hoeft te organiseren. Je gast doet gewoon mee met je leven. Aan tafel gebeurt de rest vanzelf: de taal, de gewoonten, de grappen.',
+    doubt: 'Denk je: “ik heb geen tijd voor extra zorg”? Dat hoeft ook niet. Een gast heeft een verblijfsvergunning, een uitkering of inkomen en zijn eigen dagbesteding. Wat jij biedt is een plek aan tafel.',
+    quote: '[PLACEHOLDER — citaat van een gastgezin over samen eten / gewoon meedraaien]',
+    who: '[Naam gastgezin, plaats]'
+  },
+  R: {
+    name: 'De Rustige Haven',
+    lead: 'Jij houdt van ruimte, stilte en een goed geregeld huis. En je gunt een ander precies datzelfde.',
+    fit: 'Logeren past bij jou omdat de meeste gasten net zo hun rust zoeken als jij. Na jaren in een azc is een eigen kamer en een deur die dicht kan al een geschenk. Jullie leven naast elkaar, niet op elkaar.',
+    doubt: 'Denk je: “ik verlies mijn privacy”? Gastgezinnen zeggen achteraf vaak hoe weinig ze van hun gast merkten. Duidelijke afspraken vooraf, en je matchmaker helpt daarbij.',
+    quote: '[PLACEHOLDER — citaat van een gastgezin over ruimte / privacy die meeviel]',
+    who: '[Naam gastgezin, plaats]'
+  },
+  W: {
+    name: 'De Wegwijzer',
+    lead: 'Jij vindt het leuk om iemand de weg te wijzen. De kortste route naar het station, de beste bakker, hoe de bieb werkt.',
+    fit: 'Logeren past bij jou omdat je gast precies dat nodig heeft: iemand die de buurt kent en het gewone leven uitlegt. In drie maanden leert je gast meer van jou dan in een jaar op een kamer alleen.',
+    doubt: 'Denk je: “wat als de taal niet lukt”? Dat is geen probleem maar de bedoeling. Je gast wil Nederlands leren, en jouw keukentafel is de beste les die er is.',
+    quote: '[PLACEHOLDER — citaat van een gastgezin over de buurt laten zien / taal]',
+    who: '[Naam gastgezin, plaats]'
+  },
+  T: {
+    name: 'Het Grote Hart',
+    lead: 'Jij wilt wél. Het idee is alleen spannend. En dat is precies hoe bijna elk gastgezin begon.',
+    fit: 'Logeren past bij jou omdat je nieuwsgierig bent en zorgvuldig. Je stelt vragen vooraf, je wilt weten wie er komt. Dat doet Takecarebnb ook: elke match wordt met aandacht gemaakt en er is altijd een matchmaker in de buurt.',
+    doubt: 'Denk je: “ik weet niet wie ik in huis haal”? Dat weet je wél. Voor de match zijn er gesprekken, een kennismaking, en je beslist zelf. Niets gebeurt zonder jouw ja.',
+    quote: '[PLACEHOLDER — citaat van een gastgezin over spanning vooraf die verdween]',
+    who: '[Naam gastgezin, plaats]'
+  }
+};
+
+PROFILES.K.hook = 'Benieuwd hoe andere Keukentafels het deden?';
+PROFILES.R.hook = 'Benieuwd hoe andere Rustige Havens hun ruimte hielden?';
+PROFILES.W.hook = 'Benieuwd hoe andere Wegwijzers hun gast op weg hielpen?';
+PROFILES.T.hook = 'Benieuwd hoe anderen met een groot hart over de drempel stapten?';
+
+var lead = { name: '' };
+function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+var QUESTIONS = [
+  { q: 'Vrijdagavond, de bel gaat. Een buurvrouw die je nauwelijks kent staat voor de deur met een probleem. Wat doe je?',
+    a: [['Kom binnen, ik zet koffie','K'],['Ik help op de stoep, mijn avond is van mij','R'],['Ik loop mee om het op te lossen','W'],['Even schrikken, dan toch helpen','T']] },
+  { q: 'Je hebt een logé voor een weekend. Wat ligt er klaar?',
+    a: [['Ontbijt, en we eten samen','K'],['Schone handdoeken en een sleutel','R'],['Een lijstje met mijn favoriete plekken','W'],['Ik heb alles drie keer gecheckt','T']] },
+  { q: 'Iemand spreekt je aan in een taal die je niet verstaat.',
+    a: [['Handen en voeten, komt goed','K'],['Ik zoek er een app bij','R'],['Ik wijs, teken, lach','W'],['Ik voel me even opgelaten','T']] },
+  { q: 'Wat is bij jou thuis het belangrijkste moment van de dag?',
+    a: [['Het avondeten','K'],['Het uur voor mezelf','R'],['Het moment dat ik naar buiten ga','W'],['Als iedereen veilig thuis is','T']] },
+  { q: 'Je leest in het nieuws over vluchtelingen. Wat denk je?',
+    a: [['Ik zou zo iemand aan tafel willen hebben','K'],['Ik lees door, het is groot en ver weg','R'],['Ik wil weten hoe het écht zit','W'],['Het raakt me, maar ik weet niet wat ik kan doen','T']] },
+  { q: 'Een vriend logeert drie maanden bij je. Wat is het eerste dat je regelt?',
+    a: [['Een extra stoel aan tafel','K'],['Afspraken over stille uren','R'],['Een lijstje: huisarts, bieb, station','W'],['Een goed gesprek vooraf over verwachtingen','T']] },
+  { q: 'Wat zou je het meest verrassen aan een gast uit een ander land?',
+    a: [['Wat hij kookt','K'],['Hoe weinig ik van hem merk','R'],['Hoe snel hij de buurt kent','W'],['Hoe gewoon het na een week voelt','T']] },
+  { q: 'Eerlijk: hoe voelt het idee om drie maanden iemand in huis te hebben?',
+    a: [['Gezellig','K'],['Prima, als ik mijn ruimte houd','R'],['Als een avontuur','W'],['Spannend, maar ik ben nieuwsgierig','T']] }
+];
+
+/* ── logica ── */
+var stage = document.getElementById('stage');
+var bar = document.getElementById('bar');
+var answers = [];
+var step = -1; // -1 intro, 0..7 vragen, 8 resultaat
+var KEYS = ['A','B','C','D'];
+
+function setBar() {
+  var pct = step < 0 ? 0 : Math.min(100, Math.round((step / QUESTIONS.length) * 100));
+  bar.style.width = pct + '%';
+}
+
+function render() {
+  setBar();
+  stage.innerHTML = '';
+  var s = document.createElement('section');
+  s.className = 'screen active';
+
+  if (step < 0) {
+    s.innerHTML =
+      '<span class="eyebrow">Takecarebnb</span>' +
+      '<h1>Hoe gastvrij ben jij?</h1>' +
+      '<p>Acht vragen. Geen goede of foute antwoorden. Aan het eind weet je wat voor gastgezin jij zou zijn, en of drie maanden iemand in huis iets voor jou is.</p>' +
+      '<label class="f" style="margin-top:8px"><span>Hoe mogen we je noemen?</span><input type="text" id="name" autocomplete="given-name" placeholder="Je voornaam" value="' + esc(lead.name) + '"></label>' +
+      '<p class="soft">Duurt twee minuten.</p>' +
+      '<div class="nav"><button class="btn" id="start">Start de quiz</button></div>';
+    stage.appendChild(s);
+    var nameEl = document.getElementById('name');
+    nameEl.focus();
+    document.getElementById('start').addEventListener('click', function () {
+      lead.name = nameEl.value.trim();
+      step = 0; render();
+    });
+    return;
+  }
+
+  if (step < QUESTIONS.length) {
+    var item = QUESTIONS[step];
+    var qtext = item.q;
+    if (lead.name && (step === 0 || step === 7)) qtext = esc(lead.name) + ', ' + qtext.charAt(0).toLowerCase() + qtext.slice(1);
+    var html = '<span class="eyebrow">Vraag ' + (step + 1) + ' van ' + QUESTIONS.length + '</span>' +
+      '<h2>' + qtext + '</h2><div class="answers" role="group">';
+    item.a.forEach(function (opt, i) {
+      var picked = answers[step] === opt[1] ? ' picked' : '';
+      html += '<button type="button" data-v="' + opt[1] + '" class="' + picked.trim() + '"><span class="key">' + KEYS[i] + '</span>' + opt[0] + '</button>';
+    });
+    html += '</div><div class="nav">' + (step > 0 ? '<button class="back" id="back">Vorige</button>' : '') + '</div>';
+    s.innerHTML = html;
+    stage.appendChild(s);
+    s.querySelectorAll('.answers button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        answers[step] = b.dataset.v;
+        b.classList.add('picked');
+        setTimeout(function () { step++; render(); }, 220);
+      });
+    });
+    var back = document.getElementById('back');
+    if (back) back.addEventListener('click', function () { step--; render(); });
+    return;
+  }
+
+  // resultaat, meteen na de laatste vraag
+  var p = PROFILES[result()];
+  var greet = lead.name ? esc(lead.name) + ', jij bent' : 'Jij bent';
+  s.innerHTML =
+    '<span class="eyebrow">' + greet + '</span>' +
+    '<h1 class="profile-name">' + p.name + '</h1>' +
+    '<p style="font-size:19px">' + p.lead + '</p>' +
+    '<p>' + p.fit + '</p>' +
+    '<p>' + p.doubt + '</p>' +
+    '<blockquote class="quote">' + p.quote + '<cite>' + p.who + '</cite></blockquote>' +
+
+    /* zachte leadvraag, per profiel een eigen reden */
+    '<div id="leadbox" style="background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin:8px 0 26px">' +
+      '<h2 style="font-size:22px;margin-bottom:8px">' + p.hook + '</h2>' +
+      '<p class="soft" style="margin-bottom:14px">We sturen je drie korte verhalen van gastgezinnen die op jou lijken. Meer niet.</p>' +
+      '<label class="f"><span>E-mailadres</span><input type="email" id="email" autocomplete="email"></label>' +
+      '<label class="f"><span>Telefoonnummer <em class="soft">(niet verplicht)</em></span><input type="tel" id="phone" autocomplete="tel"></label>' +
+      '<label class="check"><input type="checkbox" id="call"> Takecarebnb mag me bellen om te vertellen hoe logeren in de praktijk werkt.</label>' +
+      '<p class="err" id="err">Vul een geldig e-mailadres in.</p>' +
+      '<div class="nav" style="margin-top:6px"><button class="btn" id="send">Stuur me de verhalen</button></div>' +
+      '<p class="soft" style="margin:14px 0 0;font-size:13px">Alleen voor de verhalen en, als je dat aanvinkt, één keer contact. Afmelden kan altijd. <a href="https://takecarebnb.org/privacy-voorwaarden/" target="_blank" rel="noopener" style="color:inherit">Privacybeleid</a>.</p>' +
+    '</div>' +
+
+    '<h2 style="margin-top:8px">Liever meteen verder?</h2>' +
+    '<div class="ctas">' +
+      '<a class="btn" href="' + LINKS.inschrijven + '" target="_top">Inschrijven als gastgezin</a>' +
+      '<a class="btn ghost" href="' + LINKS.folder + '" target="_top">Informatiefolder aanvragen</a>' +
+      '<a class="btn ghost" href="' + LINKS.vragenuur + '" target="_top">Meld je aan voor het vragenuur</a>' +
+    '</div>' +
+    '<div class="share"><p class="soft">Benieuwd wat voor gastgezin je vrienden zijn?</p><button class="btn ghost" id="share">Deel de quiz</button></div>';
+  stage.appendChild(s);
+  document.getElementById('send').addEventListener('click', submitLead);
+  document.getElementById('share').addEventListener('click', function () {
+    var url = location.href.split('?')[0];
+    var text = 'Ik ben ' + p.name + '. Hoe gastvrij ben jij? ' + url;
+    if (navigator.share) navigator.share({ title: 'Hoe gastvrij ben jij?', text: text, url: url });
+    else { navigator.clipboard && navigator.clipboard.writeText(text); this.textContent = 'Link gekopieerd'; }
+  });
+}
+
+function result() {
+  var score = { K: 0, R: 0, W: 0, T: 0 };
+  answers.forEach(function (v) { score[v]++; });
+  // laatste vraag telt dubbel: die zegt het meest over waar iemand staat
+  if (answers[QUESTIONS.length - 1]) score[answers[QUESTIONS.length - 1]]++;
+  return Object.keys(score).sort(function (a, b) { return score[b] - score[a]; })[0];
+}
+
+function submitLead() {
+  var name = lead.name;
+  var email = document.getElementById('email').value.trim();
+  var phone = document.getElementById('phone').value.trim();
+  var call = document.getElementById('call').checked;
+  var err = document.getElementById('err');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.classList.add('show'); return; }
+  err.classList.remove('show');
+
+  var payload = {
+    voornaam: name, email: email, telefoon: phone, mag_bellen: call ? 'ja' : 'nee',
+    profiel: PROFILES[result()].name,
+    antwoorden: answers.join(''),
+    laatste_vraag: QUESTIONS[7].a.filter(function (o) { return o[1] === answers[7]; })[0][0],
+    bron: document.referrer || 'direct'
+  };
+
+  var btn = document.getElementById('send');
+  btn.disabled = true; btn.textContent = 'Even geduld…';
+
+  function done() {
+    document.getElementById('leadbox').innerHTML =
+      '<h2 style="font-size:22px;margin-bottom:6px">Dank je' + (name ? ', ' + esc(name) : '') + '.</h2>' +
+      '<p class="soft" style="margin:0">De verhalen komen eraan.' + (call ? ' En we bellen je binnenkort.' : '') + '</p>';
+  }
+  if (ENDPOINT.indexOf('VUL-IN') !== -1) { done(); return; } // preview
+
+  fetch(ENDPOINT, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function (r) { if (!r.ok) throw 0; done(); })
+    .catch(function () {
+      btn.disabled = false; btn.textContent = 'Stuur me de verhalen';
+      err.textContent = 'Versturen lukte niet. Probeer het nog een keer.'; err.classList.add('show');
+    });
+}
+
+// toetsenbord: A/B/C/D kiest een antwoord, Enter gaat door op intro/gate
+document.addEventListener('keydown', function (e) {
+  if (step >= 0 && step < QUESTIONS.length) {
+    var i = KEYS.indexOf(e.key.toUpperCase());
+    var btns = stage.querySelectorAll('.answers button');
+    if (i > -1 && btns[i]) btns[i].click();
+  } else if (e.key === 'Enter') {
+    var b = document.getElementById('start') || document.getElementById('send');
+    if (b && document.activeElement.tagName !== 'A') b.click();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
