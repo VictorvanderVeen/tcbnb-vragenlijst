@@ -116,7 +116,7 @@
   .counter.full { color: #a33a20; }
 
   .error { display: none; color: #a33a20; font-size: 14px; margin-top: 8px; }
-  .q.invalid .error { display: block; }
+  .error.show { display: block; }
   .q.invalid textarea, .q.invalid .options label { border-color: #a33a20; }
 
   .submit-row { margin-top: 32px; display: flex; flex-direction: column; gap: 14px; }
@@ -236,14 +236,17 @@
 
     <div class="q">
       <span class="q-num">VRAAG 9 VAN 9</span>
-      <span class="q-label">Mogen we contact opnemen om je verhaal te delen?</span>
+      <span class="q-label">Mogen we je verhaal delen in onze communicatie naar buiten?</span>
       <div class="options" role="radiogroup">
-        <label><input type="radio" name="contact" value="Ja" required> Ja, graag</label>
-        <label><input type="radio" name="contact" value="Ja, anoniem"> Ja, maar zonder vermelding van mijn naam onder mijn verhaal</label>
-        <label><input type="radio" name="contact" value="Nee"> Nee</label>
+        <label><input type="radio" name="contact" value="Ja, natuurlijk!" required> Ja natuurlijk!</label>
+        <label><input type="radio" name="contact" value="Ja, maar ik wil weten hoe"> Ja, maar ik wil wel weten hoe</label>
+        <label><input type="radio" name="contact" value="Ja, alleen anoniem"> Ja, maar dan alleen anoniem</label>
+        <label><input type="radio" name="contact" value="Nee, liever niet"> Nee, liever niet</label>
       </div>
-      <input type="email" id="email" name="email" placeholder="Je e-mailadres" aria-label="Je e-mailadres" hidden>
-      <p class="error">Kies één antwoord en vul graag je e-mailadres in als je ja zegt.</p>
+      <p class="error" data-error="radio">Kies één antwoord.</p>
+      <p class="q-help" style="margin-top:14px">Als je wilt dat we hierover contact met je opnemen, laat dan hieronder je e-mailadres achter.</p>
+      <input type="email" id="email" name="email" placeholder="Je e-mailadres" aria-label="Je e-mailadres">
+      <p class="error" data-error="email">Vul een geldig e-mailadres in.</p>
     </div>
 
     <!-- honeypot tegen spam -->
@@ -266,16 +269,6 @@
 (function () {
   var form = document.getElementById('survey');
   var email = document.getElementById('email');
-
-  // E-mailveld tonen bij "ja"
-  form.querySelectorAll('input[name="contact"]').forEach(function (r) {
-    r.addEventListener('change', function () {
-      var show = r.value.indexOf('Ja') === 0;
-      email.hidden = !show;
-      email.required = show;
-      if (show) email.focus();
-    });
-  });
 
   // Max 3 bij vraag 4
   form.querySelectorAll('.q[data-max]').forEach(function (q) {
@@ -302,17 +295,29 @@
   function validate() {
     var ok = true, first = null;
     form.querySelectorAll('.q').forEach(function (q) {
-      var valid = true;
       var ta = q.querySelector('textarea');
       var radios = q.querySelectorAll('input[type="radio"]');
       var checks = q.querySelectorAll('input[type="checkbox"]');
-      if (ta && ta.required && !ta.value.trim()) valid = false;
-      if (radios.length && !q.querySelector('input[type="radio"]:checked')) valid = false;
+
+      var radioOk = !radios.length || !!q.querySelector('input[type="radio"]:checked');
+      var checksOk = true;
       if (checks.length) {
         var n = q.querySelectorAll('input[type="checkbox"]:checked').length;
-        if (n < 1 || n > +q.dataset.max) valid = false;
+        checksOk = n >= 1 && n <= +q.dataset.max;
       }
-      if (q.contains(email) && email.required && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)) valid = false;
+      var taOk = !ta || !ta.required || !!ta.value.trim();
+      var emailOk = true;
+      if (q.contains(email) && email.value.trim()) {
+        emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value);
+      }
+      var valid = radioOk && checksOk && taOk && emailOk;
+
+      q.querySelectorAll('.error').forEach(function (errEl) {
+        var key = errEl.dataset.error;
+        var show = key === 'email' ? !emailOk : key === 'radio' ? !radioOk : !valid;
+        errEl.classList.toggle('show', show);
+      });
+
       q.classList.toggle('invalid', !valid);
       if (!valid) { ok = false; first = first || q; }
     });
