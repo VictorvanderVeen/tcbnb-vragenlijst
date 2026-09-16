@@ -112,6 +112,9 @@
   textarea:focus, input:focus { outline: 3px solid var(--ink); outline-offset: 2px; border-color: var(--ink); }
   input[type="email"] { margin-top: 12px; }
 
+  .field { display: block; margin-top: 14px; }
+  .field span { display: block; font-weight: 500; font-size: 15px; margin-bottom: 6px; }
+
   .counter { font-size: 13px; color: var(--ink-soft); margin-top: 6px; text-align: right; }
   .counter.full { color: #a33a20; }
 
@@ -244,9 +247,15 @@
         <label><input type="radio" name="contact" value="Nee, liever niet"> Nee, liever niet</label>
       </div>
       <p class="error" data-error="radio">Kies één antwoord.</p>
-      <p class="q-help" style="margin-top:14px">Als je wilt dat we hierover contact met je opnemen, laat dan hieronder je e-mailadres achter.</p>
-      <input type="email" id="email" name="email" placeholder="Je e-mailadres" aria-label="Je e-mailadres">
+
+      <p class="q-help" style="margin-top:14px">Wil je op de hoogte gehouden worden van de resultaten van dit onderzoek? Of wil je dat we contact opnemen over je verhaal? Laat dan hieronder je naam en e-mailadres achter.</p>
+      <label class="field"><span>Naam</span><input type="text" id="naam_contact" name="naam_contact" autocomplete="name" placeholder="Je naam"></label>
+      <label class="field"><span>E-mailadres</span><input type="email" id="email" name="email" autocomplete="email" placeholder="Je e-mailadres"></label>
       <p class="error" data-error="email">Vul een geldig e-mailadres in.</p>
+      <div class="options" style="margin-top:12px">
+        <label><input type="checkbox" name="opt_in" value="Op de hoogte houden"> Houd me op de hoogte van het onderzoek</label>
+        <label><input type="checkbox" name="opt_in" value="Contact opnemen"> Neem contact met me op</label>
+      </div>
     </div>
 
     <!-- honeypot tegen spam -->
@@ -301,7 +310,7 @@
 
       var radioOk = !radios.length || !!q.querySelector('input[type="radio"]:checked');
       var checksOk = true;
-      if (checks.length) {
+      if (checks.length && q.dataset.max) {
         var n = q.querySelectorAll('input[type="checkbox"]:checked').length;
         checksOk = n >= 1 && n <= +q.dataset.max;
       }
