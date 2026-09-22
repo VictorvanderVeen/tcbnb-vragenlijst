@@ -34,7 +34,11 @@
   .progress { position: fixed; top: 0; left: 0; right: 0; height: 5px; background: var(--line); z-index: 10; }
   .progress i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .35s ease; }
 
-  .stage { max-width: 620px; margin: 0 auto; padding: 56px 24px 64px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+  .site-header { max-width: 620px; margin: 0 auto; padding: 28px 24px 0; }
+  .site-header a { display: inline-block; line-height: 0; }
+  .logo-mark { width: 130px; height: auto; }
+
+  .stage { max-width: 620px; margin: 0 auto; padding: 24px 24px 64px; min-height: calc(100vh - 70px); display: flex; flex-direction: column; justify-content: center; }
   .screen { display: none; animation: in .3s ease both; }
   .screen.active { display: block; }
   @keyframes in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
@@ -98,6 +102,22 @@
 </head>
 <body>
 <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+<header class="site-header">
+  <a href="https://takecarebnb.org" target="_top" aria-label="Takecarebnb">
+    <svg class="logo-mark" viewBox="0 0 170 23" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
+      <path d="M43.4684 6.69865H38.2551L33.4786 12.4944H33.1874V0L28.877 0.485409V21.6104H33.1874V15.2613H33.4786L38.3424 21.6104H43.5849L37.2648 13.8633L43.4684 6.69865Z" fill="#FA5462"/>
+      <path d="M50.0012 6.23267C45.1957 6.23267 41.7881 9.37812 41.7881 14.038C41.7881 18.698 45.1957 22.0764 50.0303 22.0764C53.6418 22.0764 56.5251 20.4454 57.4571 17.766L53.7874 16.834C53.1467 18.0572 51.8652 18.8727 50.2051 18.8727C48.079 18.8727 46.5936 17.5039 46.2441 15.4069H57.9522C58.0105 15.0865 58.0105 14.4749 58.0105 14.0963C58.0105 9.40724 54.7485 6.23267 50.0012 6.23267ZM46.215 12.7274C46.5645 10.747 47.9334 9.43637 49.8847 9.43637C51.8361 9.43637 53.3505 10.8343 53.6127 12.7274H46.215Z" fill="#FA5462"/>
+      <path d="M67.1472 18.5232C64.9629 18.5232 63.3319 16.7175 63.3319 14.1545C63.3319 11.5916 64.992 9.78586 67.1764 9.78586C68.8365 9.78586 70.3509 10.9217 70.7296 12.5527L74.7487 12.0285C74.2536 8.50438 71.1664 6.23267 67.1181 6.23267C62.3126 6.23267 59.0215 9.40724 59.0215 14.1545C59.0215 18.9018 62.3708 22.0764 67.1181 22.0764C71.1082 22.0764 74.2245 19.8047 74.7779 16.2806L70.7296 15.7855C70.3218 17.3874 68.8656 18.5232 67.1472 18.5232Z" fill="#FA5462"/>
+      <path d="M102.801 6.78609C102.335 6.55309 101.723 6.40747 101.111 6.40747C99.5387 6.40747 98.0824 7.33946 97.4417 8.73743H97.1213V6.69872H92.8691V21.6105H97.1796V13.9799C97.1796 11.679 98.4611 10.1063 100.354 10.1063C100.966 10.1063 101.956 10.281 102.801 10.6597V6.78609Z" fill="#FA5462"/>
+      <path d="M111.014 6.23267C106.208 6.23267 102.801 9.37812 102.801 14.038C102.801 18.698 106.208 22.0764 111.043 22.0764C114.654 22.0764 117.538 20.4454 118.47 17.766L114.8 16.834C114.159 18.0572 112.878 18.8727 111.218 18.8727C109.092 18.8727 107.606 17.5039 107.257 15.4069H118.965C119.023 15.0865 119.023 14.4749 119.023 14.0963C119.023 9.40724 115.761 6.23267 111.014 6.23267ZM107.228 12.7274C107.577 10.747 108.946 9.43637 110.897 9.43637C112.849 9.43637 114.363 10.8343 114.625 12.7274H107.228Z" fill="#FA5462"/>
+      <path d="M129.488 6.24242C127.449 6.24242 125.818 7.08703 124.77 8.57238H124.478V0.00976562L120.168 0.495175V21.6202H124.478V19.7271H124.77C125.818 21.2416 127.362 22.0862 129.488 22.0862C133.594 22.0862 136.536 18.9116 136.536 14.1643C136.536 9.417 133.565 6.24242 129.488 6.24242ZM128.265 18.4165C125.964 18.4165 124.304 16.5525 124.304 14.1643C124.304 11.7761 125.964 9.94124 128.265 9.94124C130.565 9.94124 132.196 11.7761 132.196 14.1643C132.196 16.5525 130.536 18.4165 128.265 18.4165Z" fill="#FA5462"/>
+      <path d="M162.952 6.24242C160.913 6.24242 159.282 7.08703 158.234 8.57238H157.942V0.00976562L153.632 0.495175V21.6202H157.942V19.7271H158.234C159.282 21.2416 160.826 22.0862 162.952 22.0862C167.058 22.0862 170 18.9116 170 14.1643C170 9.417 167.029 6.24242 162.952 6.24242ZM161.728 18.4165C159.428 18.4165 157.768 16.5525 157.768 14.1643C157.768 11.7761 159.428 9.94124 161.728 9.94124C164.029 9.94124 165.66 11.7761 165.66 14.1643C165.66 16.5525 164 18.4165 161.728 18.4165Z" fill="#FA5462"/>
+      <path d="M27.2072 19.0135C27.0276 19.0864 26.8286 19.1252 26.6295 19.1203C26.6053 19.1203 26.581 19.1155 26.5519 19.1155C26.4791 19.1058 26.4063 19.0912 26.3383 19.0718C26.2946 19.0572 26.2509 19.0378 26.2121 19.0184C26.1878 19.0087 26.1636 18.9941 26.1441 18.9796C25.9209 18.8291 25.7752 18.5718 25.7752 18.2854V11.7664C25.7752 8.38794 23.0666 6.23272 18.8145 6.23272C14.5623 6.23272 11.9119 8.32969 11.9119 11.5916H16.135C16.1059 10.1063 17.1835 9.23255 18.7562 9.23255C20.4746 9.23255 21.4648 10.1937 21.4648 11.6208V12.2324L18.2902 12.611C13.6012 13.1935 11.2421 14.9118 11.2421 17.7078C11.2421 17.7903 11.2518 17.868 11.2518 17.9505C11.0431 18.1252 10.6256 18.4747 10.5091 18.5718C10.1353 18.8873 9.26646 19.3582 8.53835 19.3339C8.01411 19.3145 7.49472 19.1058 7.11124 18.7466C6.5239 18.2029 6.33459 17.3583 6.33459 16.5865V9.80048H9.74216V6.65503H6.33459L6.36371 2.28149H2.6649L2.14065 6.65503H0V9.80048H2.02416V16.7612C2.02416 19.9067 3.94638 22.0328 6.94621 22.0328C6.98504 22.0328 7.01902 22.0328 7.05785 22.0328C7.4753 22.0279 7.94615 21.96 8.33933 21.8095C8.86357 21.6105 8.99949 21.5619 9.34898 21.3387C10.0625 20.8872 10.3198 20.7707 10.9023 20.2271C11.0965 20.0475 11.4362 19.7951 11.645 19.5669C12.3925 21.1154 14.1303 21.9988 16.3971 21.9988C18.5232 21.9988 20.2416 21.2125 21.1735 19.7271C21.2318 19.7271 21.3483 19.7028 21.4017 19.7271C21.5036 19.7756 21.4357 19.8436 21.4405 19.9601C21.4599 20.2222 21.5473 20.6154 21.7366 20.9503C21.892 21.227 22.222 21.5474 22.3871 21.6542C22.5715 21.7707 23.0424 22.0474 23.6054 22.0716C24.1151 22.091 24.6733 22.1056 25.1733 21.9843C26.1102 21.761 26.9402 21.2804 27.7169 20.7125C27.9256 20.562 28.1052 20.4018 28.2994 20.2319C28.4692 20.0863 28.644 19.9407 28.877 19.7465V19.3194C28.8721 18.8194 28.8818 18.266 28.877 17.766C28.6052 17.9893 28.3188 18.232 28.0615 18.4553C27.7994 18.6786 27.5276 18.8922 27.2072 19.0233V19.0135ZM21.4648 15.9021C21.4648 17.766 19.9794 19.164 17.8242 19.164C16.3389 19.164 15.4651 18.465 15.4651 17.3583C15.4651 16.3389 16.2806 15.4943 18.4067 15.2322L21.4648 14.8536V15.9021Z" fill="#FA5462"/>
+      <path d="M91.1985 19.0135C91.0189 19.0863 90.8199 19.1251 90.6209 19.1203C90.5966 19.1203 90.5723 19.1154 90.5432 19.1154C90.4704 19.1057 90.3976 19.0912 90.3296 19.0717C90.2859 19.0572 90.2422 19.0378 90.2034 19.0183C90.1791 19.0086 90.1549 18.9941 90.1355 18.9795C89.9122 18.829 89.7665 18.5718 89.7665 18.2854V11.7663C89.7665 8.38788 87.058 6.23267 82.8058 6.23267C78.5536 6.23267 75.9033 8.32963 75.9033 11.5916H80.1263C80.0972 10.1062 81.1748 9.23249 82.7475 9.23249C84.4659 9.23249 85.4561 10.1936 85.4561 11.6207V12.2323L82.2815 12.6109C77.5925 13.1934 75.2334 14.9118 75.2334 17.7077C75.2334 20.5037 77.3304 21.989 80.3884 21.989C82.5145 21.989 84.2329 21.2027 85.1649 19.7173C85.2231 19.7173 85.3396 19.6931 85.393 19.7173C85.4949 19.7659 85.427 19.8338 85.4318 19.9503C85.4513 20.2124 85.5386 20.6056 85.7279 20.9406C85.8833 21.2172 86.2133 21.5376 86.3784 21.6444C86.5628 21.7609 87.0337 22.0376 87.5968 22.0619C88.1065 22.0813 88.6647 22.0958 89.1646 21.9745C90.1015 21.7512 90.9315 21.2706 91.7082 20.7027C91.9169 20.5522 92.0965 20.3921 92.2907 20.2222C92.4606 20.0765 92.6353 19.9309 92.8683 19.7367V19.3096C92.8635 18.8096 92.8732 18.2563 92.8683 17.7563C92.5965 17.9796 92.3101 18.2223 92.0528 18.4456C91.7907 18.6688 91.5189 18.8824 91.1985 19.0135ZM85.4561 15.902C85.4561 17.766 83.9708 19.164 81.8155 19.164C80.3302 19.164 79.4565 18.465 79.4565 17.3582C79.4565 16.3389 80.2719 15.4943 82.398 15.2322L85.4561 14.8535V15.902Z" fill="#FA5462"/>
+      <path d="M146.652 6.23267C144.846 6.23267 143.419 7.07728 142.313 8.7665H142.021V6.66953H137.711V21.5813H142.021V13.1934C142.021 11.3003 143.448 9.93148 145.167 9.93148C146.885 9.93148 147.963 11.213 147.963 13.0478V21.5813H152.273V12.4362C152.273 8.85388 150.031 6.23267 146.652 6.23267Z" fill="#FA5462"/>
+    </svg>
+  </a>
+</header>
 <main class="stage" id="stage"></main>
 
 <script>
@@ -136,7 +156,7 @@ var PROFILES = {
     name: 'De Wegwijzer',
     lead: 'Jij vindt het leuk om iemand de weg te wijzen. De kortste route naar het station, de beste bakker, hoe de bieb werkt.',
     fit: 'Logeren past bij jou omdat je gast precies dat nodig heeft: iemand die de buurt kent en het gewone leven uitlegt. In drie maanden leert je gast meer van jou dan in een jaar op een kamer alleen.',
-    doubt: 'Denk je: “wat als de taal niet lukt”? Dat is geen probleem maar de bedoeling. Je gast wil Nederlands leren, en jouw keukentafel is de beste les die er is.',
+    doubt: 'Denk je: “wat als de taal niet lukt”? Daar kom je samen uit. Je gast wil Nederlands leren, en het gesprek aan jouw keukentafel is de beste les die er is.',
     quote: '[PLACEHOLDER — citaat van een gastgezin over de buurt laten zien / taal]',
     who: '[Naam gastgezin, plaats]'
   },
@@ -162,7 +182,7 @@ var QUESTIONS = [
   { q: 'Het is vrijdagavond, de bel gaat. Een buurvrouw die je nauwelijks kent staat voor de deur met een probleem. Wat doe je?',
     a: [["Ik zeg: 'Kom binnen', en zet koffie",'K'],['Ik help op de stoep; mijn avond is van mij','R'],['Ik loop meteen mee om het op te lossen','W'],['Ik schrik even, maar ga dan toch helpen','T']] },
   { q: 'Je hebt een logé voor een weekend. Waarvoor zorg jij sowieso?',
-    a: [['Ontbijt, en we eten samen','K'],['Schone handdoeken en een sleutel','R'],['Een lijstje met mijn favoriete plekken','W'],['Ik heb alles drie keer nagekeken of alles in orde is voor hem/haar','T']] },
+    a: [['Ontbijt, en we eten samen','K'],['Schone handdoeken en een sleutel','R'],['Een lijstje met mijn favoriete plekken','W'],['Ik heb drie keer nagekeken of alles in orde is voor hem/haar','T']] },
   { q: 'Iemand spreekt je aan in een taal die je niet verstaat. Hoe reageer je?',
     a: [['Met handen en voeten, komt goed','K'],['Ik zoek er een app bij','R'],['Ik lach vooral heel vriendelijk','W'],['Ik kijk om me heen of iemand anders kan helpen','T']] },
   { q: 'Wat is bij jou thuis het belangrijkste moment van de dag?',
@@ -172,7 +192,7 @@ var QUESTIONS = [
   { q: 'Een vriend logeert drie maanden bij je. Wat is het eerste dat je regelt?',
     a: [['Een extra stoel aan tafel','K'],['Afspraken over stille uren','R'],['Een lijstje: huisarts, bieb, station','W'],['Een goed gesprek vooraf over verwachtingen','T']] },
   { q: 'Wat zou je het meest verrassen aan een gast uit een ander land?',
-    a: [['Wat hij kookt','K'],['Hoe weinig ik van hem merk','R'],['Hoe snel hij de buurt kent','W'],['Hoe gewoon het na een week voelt','T']] },
+    a: [['Hoeveel ik van hem/haar leer','K'],['Hoe weinig ik van hem/haar merk','R'],['Hoe snel hij/zij de buurt kent','W'],['Hoe gewoon het logeren na een week voelt','T']] },
   { q: 'Eerlijk: hoe voelt het idee om drie maanden iemand in huis te hebben?',
     a: [['Gezellig','K'],['Prima, als ik ook maar mijn eigen tijd en ruimte houd','R'],['Als een avontuur','W'],['Spannend, maar ik ben nieuwsgierig','T']] }
 ];
