@@ -132,7 +132,7 @@
    - ENDPOINT: waar de lead naartoe gaat (Formspree, Make, Zapier, eigen script).
      Zolang hier 'VUL-IN' in staat, draait de quiz in preview-modus en wordt niets verzonden.
    - LINKS: de drie knoppen na het resultaat.
-   - Citaten in PROFILES zijn placeholders; vul ze in vanuit het gastgezinnen-onderzoek (vraag 3 en 8).
+   - Citaat per profiel: voeg in PROFILES quote: '...' en who: '...' toe; zonder quote wordt geen citaatblok getoond.
 ──────────────────────────────────────────────────────────────── */
 var ENDPOINT = 'https://formspree.io/f/xyezgrzr';
 var LINKS = {
@@ -146,33 +146,25 @@ var PROFILES = {
     name: 'De Keukentafel',
     lead: 'Bij jou schuift iedereen aan. Een extra bord is nooit een probleem, en het beste gesprek voer je met een pan op tafel.',
     fit: 'Logeren past bij jou omdat je niets hoeft te organiseren. Je gast doet gewoon mee met je leven. Aan tafel gebeurt de rest vanzelf: de taal, de gewoonten, de grappen.',
-    doubt: 'Denk je: “ik heb geen tijd voor extra zorg”? Dat hoeft ook niet. Een gast heeft een verblijfsvergunning, een uitkering of inkomen en zijn eigen dagbesteding. Wat jij biedt is een plek aan tafel.',
-    quote: '[PLACEHOLDER — citaat van een gastgezin over samen eten / gewoon meedraaien]',
-    who: '[Naam gastgezin, plaats]'
+    doubt: 'Denk je: “ik heb geen tijd voor extra zorg”? Dat hoeft ook niet. Een gast heeft een verblijfsvergunning, een uitkering of inkomen en zijn eigen dagbesteding. Wat jij biedt is een plek aan tafel.'
   },
   R: {
     name: 'De Rustige Haven',
     lead: 'Jij houdt van ruimte, stilte en een goed geregeld huis. En je gunt een ander precies datzelfde.',
     fit: 'Logeren past bij jou omdat de meeste gasten net zo hun rust zoeken als jij. Na jaren in een azc is een eigen kamer en een deur die dicht kan al een geschenk. Jullie leven naast elkaar, niet op elkaar.',
-    doubt: 'Denk je: “ik verlies mijn privacy”? Gastgezinnen zeggen achteraf vaak hoe weinig ze van hun gast merkten. Duidelijke afspraken vooraf helpen daarbij. Je matchmaker kan je daar tips voor geven.',
-    quote: '[PLACEHOLDER — citaat van een gastgezin over ruimte / privacy die meeviel]',
-    who: '[Naam gastgezin, plaats]'
+    doubt: 'Denk je: “ik verlies mijn privacy”? Gastgezinnen zeggen achteraf vaak hoe weinig ze van hun gast merkten. Duidelijke afspraken vooraf helpen daarbij. Je matchmaker kan je daar tips voor geven.'
   },
   W: {
     name: 'De Wegwijzer',
     lead: 'Jij vindt het leuk om iemand de weg te wijzen. De kortste route naar het station, de beste bakker, hoe de bieb werkt.',
     fit: 'Logeren past bij jou omdat je gast precies dat nodig heeft: iemand die de buurt kent en het gewone leven uitlegt. In drie maanden leert je gast meer van jou dan in een jaar op een kamer alleen.',
-    doubt: 'Denk je: “wat als de taal niet lukt”? Daar kom je samen uit. Je gast wil Nederlands leren, en het gesprek aan jouw keukentafel is de beste les die er is.',
-    quote: '[PLACEHOLDER — citaat van een gastgezin over de buurt laten zien / taal]',
-    who: '[Naam gastgezin, plaats]'
+    doubt: 'Denk je: “wat als de taal niet lukt”? Daar kom je samen uit. Je gast wil Nederlands leren, en het gesprek aan jouw keukentafel is de beste les die er is.'
   },
   T: {
     name: 'Het Grote Hart',
     lead: 'Jij wilt wél. Het idee is alleen spannend. En dat is precies hoe bijna elk gastgezin begon.',
     fit: 'Logeren past bij jou omdat je nieuwsgierig bent en zorgvuldig. Je stelt vragen vooraf, je wilt weten wie er komt. Dat doet Takecarebnb ook: elke match wordt met aandacht gemaakt en er is altijd een matchmaker in de buurt.',
-    doubt: 'Denk je: “ik weet niet wie ik in huis haal”? Dat weet je wél. Voor de match zijn er gesprekken, een kennismaking, en je beslist zelf. Niets gebeurt zonder jouw ‘ja’.',
-    quote: '[PLACEHOLDER — citaat van een gastgezin over spanning vooraf die verdween]',
-    who: '[Naam gastgezin, plaats]'
+    doubt: 'Denk je: “ik weet niet wie ik in huis haal”? Dat weet je wél. Voor de match zijn er gesprekken, een kennismaking, en je beslist zelf. Niets gebeurt zonder jouw ‘ja’.'
   }
 };
 
@@ -272,7 +264,7 @@ function render() {
     '<p style="font-size:19px">' + p.lead + '</p>' +
     '<p>' + p.fit + '</p>' +
     '<p>' + p.doubt + '</p>' +
-    '<blockquote class="quote">' + p.quote + '<cite>' + p.who + '</cite></blockquote>' +
+    (p.quote ? '<blockquote class="quote">' + p.quote + (p.who ? '<cite>' + p.who + '</cite>' : '') + '</blockquote>' : '') +
 
     /* zachte leadvraag, per profiel een eigen reden */
     '<div id="leadbox" style="background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin:8px 0 26px">' +
