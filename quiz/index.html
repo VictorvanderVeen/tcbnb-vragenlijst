@@ -39,6 +39,11 @@
   .logo-mark { width: 130px; height: auto; }
 
   .stage { max-width: 620px; margin: 0 auto; padding: 24px 24px 64px; min-height: calc(100vh - 70px); display: flex; flex-direction: column; justify-content: center; }
+  /* in een iframe op de klantsite: geen eigen logo, en bovenaan beginnen i.p.v. verticaal centreren */
+  html.embedded body { min-height: 0; }
+  html.embedded .site-header { display: none; }
+  html.embedded .stage { min-height: 0; justify-content: flex-start; }
+
   .screen { display: none; animation: in .3s ease both; }
   .screen.active { display: block; }
   @keyframes in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
@@ -101,6 +106,7 @@
 </style>
 </head>
 <body>
+<script>if (window.parent !== window) document.documentElement.classList.add('embedded');</script>
 <div class="progress" aria-hidden="true"><i id="bar"></i></div>
 <header class="site-header">
   <a href="https://takecarebnb.org" target="_top" aria-label="Takecarebnb">
