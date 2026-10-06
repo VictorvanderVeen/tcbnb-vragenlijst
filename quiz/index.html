@@ -129,11 +129,13 @@
 <script>
 /* ────────────────────────────────────────────────────────────────
    INSTELLINGEN
-   - ENDPOINT: waar de lead naartoe gaat (Formspree, Make, Zapier, eigen script).
+   - POCKETBASE_ENDPOINT: de collectie tcbnb_quiz_inzendingen op db.vdveen.online, waar elke lead wordt opgeslagen.
+   - ENDPOINT: Formspree, loopt tijdelijk mee. Maak leeg ('') zodra het Formspree-abonnement stopt.
      Zolang hier 'VUL-IN' in staat, draait de quiz in preview-modus en wordt niets verzonden.
    - LINKS: de drie knoppen na het resultaat.
    - Citaat per profiel: voeg in PROFILES quote: '...' en who: '...' toe; zonder quote wordt geen citaatblok getoond.
 ──────────────────────────────────────────────────────────────── */
+var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/tcbnb_quiz_inzendingen/records';
 var ENDPOINT = 'https://formspree.io/f/xyezgrzr';
 var LINKS = {
   inschrijven: 'https://takecarebnb.org/inschrijven-gastgezinnen/',
@@ -330,14 +332,32 @@ function submitLead() {
   }
   if (ENDPOINT.indexOf('VUL-IN') !== -1) { done(); return; } // preview
 
-  fetch(ENDPOINT, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify(payload)
-  }).then(function (r) { if (!r.ok) throw 0; done(); })
-    .catch(function () {
-      btn.disabled = false; btn.textContent = 'Stuur me de verhalen';
-      err.textContent = 'Versturen lukte niet. Probeer het nog een keer.'; err.classList.add('show');
+  function post(url, body) {
+    return fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { if (!r.ok) throw 0; });
+  }
+  function failed() {
+    btn.disabled = false; btn.textContent = 'Stuur me de verhalen';
+    err.textContent = 'Versturen lukte niet. Probeer het nog een keer.'; err.classList.add('show');
+  }
+
+  // PocketBase krijgt mag_bellen als echte ja/nee-waarde; de rest is gelijk aan wat Formspree krijgt
+  var pbPayload = {};
+  Object.keys(payload).forEach(function (k) { pbPayload[k] = payload[k]; });
+  pbPayload.mag_bellen = call;
+
+  var sends = [post(POCKETBASE_ENDPOINT, pbPayload)];
+  if (ENDPOINT) sends.push(post(ENDPOINT, payload));
+
+  // De lead is binnen zodra één van de twee hem heeft opgeslagen
+  var ok = 0, pending = sends.length;
+  sends.forEach(function (p) {
+    p.then(function () { ok++; }, function () {}).then(function () {
+      if (--pending === 0) { if (ok) done(); else failed(); }
     });
+  });
 }
 
 // toetsenbord: A/B/C/D kiest een antwoord, Enter gaat door op intro/gate
