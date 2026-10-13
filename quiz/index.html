@@ -101,6 +101,10 @@
   .quote cite { display: block; font-style: normal; font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
   .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
   .share { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .share-opties { display: none; margin-top: 16px; }
+  .share-opties.show { display: block; }
+  .share-opties .ctas { margin-top: 0; }
+  .share-opties input { width: 100%; margin-top: 14px; }
 
   @media (prefers-reduced-motion: reduce) { *, .screen { animation: none !important; transition: none !important; } }
 </style>
@@ -133,6 +137,8 @@
    - ENDPOINT: Formspree, loopt tijdelijk mee. Maak leeg ('') zodra het Formspree-abonnement stopt.
      Zolang hier 'VUL-IN' in staat, draait de quiz in preview-modus en wordt niets verzonden.
    - LINKS: de drie knoppen na het resultaat.
+   - DEEL_URL: het adres dat 'Deel de quiz' doorgeeft. Vul hier de pagina op takecarebnb.org in waar de quiz staat;
+     zolang dit leeg is, wordt het adres van de losse quiz gedeeld.
    - Citaat per profiel: voeg in PROFILES quote: '...' en who: '...' toe; zonder quote wordt geen citaatblok getoond.
 ──────────────────────────────────────────────────────────────── */
 var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/pbc_2925231353/records'; // id van tcbnb_quiz_inzendingen: blijft werken als de collectie wordt hernoemd
@@ -142,6 +148,8 @@ var LINKS = {
   folder: 'http://takecarebnb.org/aanvragen-informatiefolder/',
   vragenuur: 'http://takecarebnb.org/vragenuur-voor-gastgezinnen/'
 };
+
+var DEEL_URL = '';
 
 var PROFILES = {
   K: {
@@ -286,14 +294,29 @@ function render() {
       '<a class="btn ghost" href="' + LINKS.folder + '" target="_top">Informatiefolder aanvragen</a>' +
       '<a class="btn ghost" href="' + LINKS.vragenuur + '" target="_top">Meld je aan voor het vragenuur</a>' +
     '</div>' +
-    '<div class="share"><p class="soft">Benieuwd wat voor gastgezin je vrienden zijn?</p><button class="btn ghost" id="share">Deel de quiz</button></div>';
+    '<div class="share"><p class="soft">Benieuwd wat voor gastgezin je vrienden zijn?</p><button class="btn ghost" id="share">Deel de quiz</button>' +
+      '<div class="share-opties" id="shareOpties"><div class="ctas">' +
+        '<a class="btn ghost" id="shareWa" target="_blank" rel="noopener">WhatsApp</a>' +
+        '<a class="btn ghost" id="shareMail" target="_top">E-mail</a>' +
+      '</div><input type="text" id="shareLink" readonly aria-label="Link naar de quiz"></div>' +
+    '</div>';
   stage.appendChild(s);
   document.getElementById('send').addEventListener('click', submitLead);
+  /* In een iframe blokkeert de browser delen en kopiëren vaak; dan tonen we gewone deellinks. */
+  var deelUrl = DEEL_URL || location.href.split('?')[0];
+  var deelTekst = 'Ik ben ' + p.name + '. Hoe gastvrij ben jij? ' + deelUrl;
+  document.getElementById('shareWa').href = 'https://wa.me/?text=' + encodeURIComponent(deelTekst);
+  document.getElementById('shareMail').href = 'mailto:?subject=' + encodeURIComponent('Hoe gastvrij ben jij?') + '&body=' + encodeURIComponent(deelTekst);
+  var linkVeld = document.getElementById('shareLink');
+  linkVeld.value = deelUrl;
+  linkVeld.addEventListener('focus', function () { this.select(); });
+  function toonDeelOpties() { document.getElementById('shareOpties').classList.add('show'); }
   document.getElementById('share').addEventListener('click', function () {
-    var url = location.href.split('?')[0];
-    var text = 'Ik ben ' + p.name + '. Hoe gastvrij ben jij? ' + url;
-    if (navigator.share) navigator.share({ title: 'Hoe gastvrij ben jij?', text: text, url: url });
-    else { navigator.clipboard && navigator.clipboard.writeText(text); this.textContent = 'Link gekopieerd'; }
+    toonDeelOpties();
+    // het deelvenster van het apparaat werkt alleen buiten een iframe
+    if (window.self === window.top && navigator.share) {
+      navigator.share({ title: 'Hoe gastvrij ben jij?', text: deelTekst, url: deelUrl }).catch(function () {});
+    }
   });
 }
 
