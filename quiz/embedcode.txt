@@ -11,7 +11,11 @@
     var d = e.data;
     if (d.tcbnbHeight) f.style.height = d.tcbnbHeight + 'px';
     if (d.tcbnbTop && f.getBoundingClientRect().top < 0) window.scrollBy(0, f.getBoundingClientRect().top - 16);
-    if (d.tcbnbLead && window.fbq) fbq('track', 'Lead', { content_name: 'Quiz gastvrij', content_category: d.tcbnbLead.profiel });
+    if (d.tcbnbLead) {
+      // De pixel laadt via GTM na cookie-toestemming; zonder toestemming is er geen fbq en tellen we niets
+      if (window.fbq) fbq('track', 'Lead', { content_name: 'Quiz gastvrij', content_category: d.tcbnbLead.profiel });
+      (window.dataLayer = window.dataLayer || []).push({ event: 'tcbnb_quiz_lead', profiel: d.tcbnbLead.profiel });
+    }
   });
 })();
 </script>

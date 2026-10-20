@@ -101,10 +101,6 @@
   .quote cite { display: block; font-style: normal; font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
   .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
   .share { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
-  .share-opties { display: none; margin-top: 16px; }
-  .share-opties.show { display: block; }
-  .share-opties .ctas { margin-top: 0; }
-  .share-opties input { width: 100%; margin-top: 14px; }
 
   @media (prefers-reduced-motion: reduce) { *, .screen { animation: none !important; transition: none !important; } }
 </style>
@@ -136,45 +132,37 @@
    - POCKETBASE_ENDPOINT: de collectie tcbnb_quiz_inzendingen op db.vdveen.online, waar elke lead wordt opgeslagen.
    - ENDPOINT: Formspree, loopt tijdelijk mee. Maak leeg ('') zodra het Formspree-abonnement stopt.
      Zolang hier 'VUL-IN' in staat, draait de quiz in preview-modus en wordt niets verzonden.
-   - LINKS: de drie knoppen na het resultaat.
+   - INFO_URL: de knop 'Liever meer informatie over gastgezinnen' na het resultaat.
    - DEEL_URL: het adres dat 'Deel de quiz' doorgeeft. Vul hier de pagina op takecarebnb.org in waar de quiz staat;
      zolang dit leeg is, wordt het adres van de losse quiz gedeeld.
    - Citaat per profiel: voeg in PROFILES quote: '...' en who: '...' toe; zonder quote wordt geen citaatblok getoond.
 ──────────────────────────────────────────────────────────────── */
 var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/pbc_2925231353/records'; // id van tcbnb_quiz_inzendingen: blijft werken als de collectie wordt hernoemd
 var ENDPOINT = 'https://formspree.io/f/xyezgrzr';
-var LINKS = {
-  inschrijven: 'https://takecarebnb.org/inschrijven-gastgezinnen/',
-  folder: 'http://takecarebnb.org/aanvragen-informatiefolder/',
-  vragenuur: 'http://takecarebnb.org/vragenuur-voor-gastgezinnen/'
-};
+var INFO_URL = 'https://takecarebnb.org/informatie-voor-gastgezinnen/';
 
-var DEEL_URL = '';
+var DEEL_URL = 'https://takecarebnb.org/wat-voor-een-gastgezin-ben-jij/';
 
 var PROFILES = {
   K: {
     name: 'De Keukentafel',
-    lead: 'Bij jou schuift iedereen aan. Een extra bord is nooit een probleem, en het beste gesprek voer je met een pan op tafel.',
-    fit: 'Logeren past bij jou omdat je niets hoeft te organiseren. Je gast doet gewoon mee met je leven. Aan tafel gebeurt de rest vanzelf: de taal, de gewoonten, de grappen.',
-    doubt: 'Denk je: “ik heb geen tijd voor extra zorg”? Dat hoeft ook niet. Een gast heeft een verblijfsvergunning, een uitkering of inkomen en zijn eigen dagbesteding. Wat jij biedt is een plek aan tafel.'
+    lead: 'Bij jou schuift iedereen aan. Een extra bord is nooit een probleem.',
+    fit: 'Een gast doet gewoon mee met je leven. Aan tafel gebeurt de rest vanzelf.'
   },
   R: {
     name: 'De Rustige Haven',
-    lead: 'Jij houdt van ruimte, stilte en een goed geregeld huis. En je gunt een ander precies datzelfde.',
-    fit: 'Logeren past bij jou omdat de meeste gasten net zo hun rust zoeken als jij. Na jaren in een azc is een eigen kamer en een deur die dicht kan al een geschenk. Jullie leven naast elkaar, niet op elkaar.',
-    doubt: 'Denk je: “ik verlies mijn privacy”? Gastgezinnen zeggen achteraf vaak hoe weinig ze van hun gast merkten. Duidelijke afspraken vooraf helpen daarbij. Je matchmaker kan je daar tips voor geven.'
+    lead: 'Jij houdt van rust en een goed geregeld huis. En je gunt een ander precies datzelfde.',
+    fit: 'Na jaren in een azc is een eigen kamer al een geschenk. Jullie leven naast elkaar, niet op elkaar.'
   },
   W: {
     name: 'De Wegwijzer',
-    lead: 'Jij vindt het leuk om iemand de weg te wijzen. De kortste route naar het station, de beste bakker, hoe de bieb werkt.',
-    fit: 'Logeren past bij jou omdat je gast precies dat nodig heeft: iemand die de buurt kent en het gewone leven uitlegt. In drie maanden leert je gast meer van jou dan in een jaar op een kamer alleen.',
-    doubt: 'Denk je: “wat als de taal niet lukt”? Daar kom je samen uit. Je gast wil Nederlands leren, en het gesprek aan jouw keukentafel is de beste les die er is.'
+    lead: 'Jij wijst graag de weg. Naar het station, de beste bakker, de bieb.',
+    fit: 'Precies wat een gast nodig heeft: iemand die het gewone leven uitlegt.'
   },
   T: {
     name: 'Het Grote Hart',
-    lead: 'Jij wilt wél. Het idee is alleen spannend. En dat is precies hoe bijna elk gastgezin begon.',
-    fit: 'Logeren past bij jou omdat je nieuwsgierig bent en zorgvuldig. Je stelt vragen vooraf, je wilt weten wie er komt. Dat doet Takecarebnb ook: elke match wordt met aandacht gemaakt en er is altijd een matchmaker in de buurt.',
-    doubt: 'Denk je: “ik weet niet wie ik in huis haal”? Dat weet je wél. Voor de match zijn er gesprekken, een kennismaking, en je beslist zelf. Niets gebeurt zonder jouw ‘ja’.'
+    lead: 'Jij wilt wél. Het idee is alleen spannend. Zo begon bijna elk gastgezin.',
+    fit: 'Je stelt eerst vragen. Je wilt weten wie er komt. En dat is logisch.'
   }
 };
 
@@ -274,51 +262,26 @@ function render() {
     '<h1 class="profile-name">' + p.name + '</h1>' +
     '<p style="font-size:19px">' + p.lead + '</p>' +
     '<p>' + p.fit + '</p>' +
-    '<p>' + p.doubt + '</p>' +
     (p.quote ? '<blockquote class="quote">' + p.quote + (p.who ? '<cite>' + p.who + '</cite>' : '') + '</blockquote>' : '') +
 
     /* zachte leadvraag, per profiel een eigen reden */
     '<div id="leadbox" style="background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin:8px 0 26px">' +
       '<h2 style="font-size:22px;margin-bottom:8px">' + p.hook + '</h2>' +
-      '<p class="soft" style="margin-bottom:14px">We sturen je drie korte verhalen van gastgezinnen die op jou lijken.</p>' +
+      '<p class="soft" style="margin-bottom:14px">Ontvang 3 korte verhalen van gastgezinnen zoals jij.</p>' +
       '<label class="f"><span>E-mailadres</span><input type="email" id="email" autocomplete="email"></label>' +
-      '<label class="f"><span>Telefoonnummer <em class="soft">(niet verplicht)</em></span><input type="tel" id="phone" autocomplete="tel"></label>' +
-      '<label class="check"><input type="checkbox" id="call"> Takecarebnb mag me bellen om te vertellen hoe logeren in de praktijk werkt.</label>' +
+      '<label class="f"><span>Telefoon <em class="soft">(niet verplicht, dan bellen we je één keer)</em></span><input type="tel" id="phone" autocomplete="tel"></label>' +
       '<p class="err" id="err">Vul een geldig e-mailadres in.</p>' +
       '<div class="nav" style="margin-top:6px"><button class="btn" id="send">Stuur me de verhalen</button></div>' +
-      '<p class="soft" style="margin:14px 0 0;font-size:13px">Alleen voor de verhalen en, als je dat aanvinkt, één keer contact. Afmelden van onze mails kan altijd. <a href="https://takecarebnb.org/privacy-voorwaarden/" target="_blank" rel="noopener" style="color:inherit">Privacybeleid</a>.</p>' +
+      '<p class="soft" style="margin:14px 0 0;font-size:13px">Afmelden kan altijd. <a href="https://takecarebnb.org/privacy-voorwaarden/" target="_blank" rel="noopener" style="color:inherit">Privacybeleid</a>.</p>' +
     '</div>' +
 
-    '<h2 style="margin-top:8px">Liever meteen verder?</h2>' +
-    '<div class="ctas">' +
-      '<a class="btn" href="' + LINKS.inschrijven + '" target="_top">Inschrijven als gastgezin</a>' +
-      '<a class="btn ghost" href="' + LINKS.folder + '" target="_top">Informatiefolder aanvragen</a>' +
-      '<a class="btn ghost" href="' + LINKS.vragenuur + '" target="_top">Meld je aan voor het vragenuur</a>' +
-    '</div>' +
-    '<div class="share"><p class="soft">Benieuwd wat voor gastgezin je vrienden zijn?</p><button class="btn ghost" id="share">Deel de quiz</button>' +
-      '<div class="share-opties" id="shareOpties"><div class="ctas">' +
-        '<a class="btn ghost" id="shareWa" target="_blank" rel="noopener">WhatsApp</a>' +
-        '<a class="btn ghost" id="shareMail" target="_top">E-mail</a>' +
-      '</div><input type="text" id="shareLink" readonly aria-label="Link naar de quiz"></div>' +
-    '</div>';
+    '<a class="btn ghost" href="' + INFO_URL + '" target="_top">Liever meer informatie over gastgezinnen</a>' +
+    '<div class="share"><p class="soft" style="margin:0">Benieuwd wat voor gastgezin je vrienden zijn? <a class="back" id="shareWa" target="_blank" rel="noopener">Deel de quiz via WhatsApp</a></p></div>';
   stage.appendChild(s);
   document.getElementById('send').addEventListener('click', submitLead);
-  /* In een iframe blokkeert de browser delen en kopiëren vaak; dan tonen we gewone deellinks. */
+  /* Delen gaat via een gewone WhatsApp-link: die werkt ook in een iframe, waar de browser het deelvenster blokkeert. */
   var deelUrl = DEEL_URL || location.href.split('?')[0];
-  var deelTekst = 'Ik ben ' + p.name + '. Hoe gastvrij ben jij? ' + deelUrl;
-  document.getElementById('shareWa').href = 'https://wa.me/?text=' + encodeURIComponent(deelTekst);
-  document.getElementById('shareMail').href = 'mailto:?subject=' + encodeURIComponent('Hoe gastvrij ben jij?') + '&body=' + encodeURIComponent(deelTekst);
-  var linkVeld = document.getElementById('shareLink');
-  linkVeld.value = deelUrl;
-  linkVeld.addEventListener('focus', function () { this.select(); });
-  function toonDeelOpties() { document.getElementById('shareOpties').classList.add('show'); }
-  document.getElementById('share').addEventListener('click', function () {
-    toonDeelOpties();
-    // het deelvenster van het apparaat werkt alleen buiten een iframe
-    if (window.self === window.top && navigator.share) {
-      navigator.share({ title: 'Hoe gastvrij ben jij?', text: deelTekst, url: deelUrl }).catch(function () {});
-    }
-  });
+  document.getElementById('shareWa').href = 'https://wa.me/?text=' + encodeURIComponent('Ik ben ' + p.name + '. Hoe gastvrij ben jij? ' + deelUrl);
 }
 
 function result() {
@@ -333,7 +296,7 @@ function submitLead() {
   var name = lead.name;
   var email = document.getElementById('email').value.trim();
   var phone = document.getElementById('phone').value.trim();
-  var call = document.getElementById('call').checked;
+  var call = phone !== ''; // wie een nummer invult, kiest voor één keer gebeld worden
   var err = document.getElementById('err');
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.classList.add('show'); return; }
   err.classList.remove('show');
