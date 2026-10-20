@@ -219,6 +219,7 @@ function setBar() {
 
 function render() {
   setBar();
+  if (step >= 0) toOuder({ tcbnbTop: true });
   stage.innerHTML = '';
   var s = document.createElement('section');
   s.className = 'screen active';
@@ -352,6 +353,7 @@ function submitLead() {
     document.getElementById('leadbox').innerHTML =
       '<h2 style="font-size:22px;margin-bottom:6px">Dank je' + (name ? ', ' + esc(name) : '') + '.</h2>' +
       '<p class="soft" style="margin:0">De verhalen komen eraan.' + (call ? ' En we bellen je binnenkort.' : '') + '</p>';
+    toOuder({ tcbnbLead: { profiel: payload.profiel } });
   }
   if (ENDPOINT.indexOf('VUL-IN') !== -1) { done(); return; } // preview
 
@@ -382,6 +384,17 @@ function submitLead() {
     });
   });
 }
+
+/* ── koppeling met de ouderpagina (takecarebnb.org) ──
+   In een iframe stuurt de quiz drie berichten via postMessage; de embedcode op de site vangt ze op:
+   - tcbnbHeight: de hoogte, zodat de iframe meegroeit
+   - tcbnbTop: na elke stap, zodat de pagina terugscrolt naar het begin van de quiz
+   - tcbnbLead: na een geslaagde inzending, zodat de Meta-pixel op de site een Lead telt */
+function toOuder(msg) { if (window.parent !== window) window.parent.postMessage(msg, '*'); }
+function sendHeight() { toOuder({ tcbnbHeight: document.body.scrollHeight }); }
+window.addEventListener('load', sendHeight);
+window.addEventListener('resize', sendHeight);
+new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true, attributes: true });
 
 // toetsenbord: A/B/C/D kiest een antwoord, Enter gaat door op intro/gate
 document.addEventListener('keydown', function (e) {

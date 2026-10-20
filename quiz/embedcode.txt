@@ -1,0 +1,17 @@
+<!-- Embedcode voor de quiz op takecarebnb.org. Plak dit in een HTML-blok op de pagina.
+     De iframe groeit mee met de quiz, scrolt na elke vraag terug naar het begin van de quiz,
+     en telt een Meta-pixel Lead zodra iemand zijn e-mailadres heeft ingestuurd.
+     Werkt naast de vragenlijst-embed: elk script luistert alleen naar zijn eigen iframe. -->
+<iframe id="tcbnb-quiz" src="https://victorvanderveen.github.io/tcbnb-vragenlijst/quiz/" title="Quiz: Hoe gastvrij ben jij?" style="width:100%;height:700px;border:0;display:block" loading="lazy"></iframe>
+<script>
+(function () {
+  var f = document.getElementById('tcbnb-quiz');
+  window.addEventListener('message', function (e) {
+    if (e.source !== f.contentWindow || !e.data) return; // alleen berichten van déze quiz
+    var d = e.data;
+    if (d.tcbnbHeight) f.style.height = d.tcbnbHeight + 'px';
+    if (d.tcbnbTop && f.getBoundingClientRect().top < 0) window.scrollBy(0, f.getBoundingClientRect().top - 16);
+    if (d.tcbnbLead && window.fbq) fbq('track', 'Lead', { content_name: 'Quiz gastvrij', content_category: d.tcbnbLead.profiel });
+  });
+})();
+</script>
