@@ -130,7 +130,7 @@
 /* ────────────────────────────────────────────────────────────────
    INSTELLINGEN
    - POCKETBASE_ENDPOINT: de collectie tcbnb_quiz_inzendingen op db.vdveen.online, waar elke lead wordt opgeslagen.
-   - ENDPOINT: Formspree, loopt tijdelijk mee. Maak leeg ('') zodra het Formspree-abonnement stopt.
+   - ENDPOINT: optioneel tweede adres (was Formspree, uit sinds 22-10). Leeg ('') = alleen PocketBase.
      Zolang hier 'VUL-IN' in staat, draait de quiz in preview-modus en wordt niets verzonden.
    - INFO_URL: de knop 'Meer info voor gastgezinnen' na het resultaat.
    - DEEL_URL: het adres dat 'Deel de quiz' doorgeeft. Vul hier de pagina op takecarebnb.org in waar de quiz staat;
@@ -138,7 +138,7 @@
    - Citaat per profiel: voeg in PROFILES quote: '...' en who: '...' toe; zonder quote wordt geen citaatblok getoond.
 ──────────────────────────────────────────────────────────────── */
 var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/pbc_2925231353/records'; // id van tcbnb_quiz_inzendingen: blijft werken als de collectie wordt hernoemd
-var ENDPOINT = 'https://formspree.io/f/xyezgrzr';
+var ENDPOINT = '';
 var INFO_URL = 'https://takecarebnb.org/informatie-voor-gastgezinnen/';
 
 var DEEL_URL = 'https://takecarebnb.org/wat-voor-een-gastgezin-ben-jij/';
