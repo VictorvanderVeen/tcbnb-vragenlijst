@@ -132,7 +132,7 @@
    - POCKETBASE_ENDPOINT: de collectie tcbnb_quiz_inzendingen op db.vdveen.online, waar elke lead wordt opgeslagen.
    - ENDPOINT: Formspree, loopt tijdelijk mee. Maak leeg ('') zodra het Formspree-abonnement stopt.
      Zolang hier 'VUL-IN' in staat, draait de quiz in preview-modus en wordt niets verzonden.
-   - INFO_URL: de knop 'Liever meer informatie over gastgezinnen' na het resultaat.
+   - INFO_URL: de knop 'Meer info voor gastgezinnen' na het resultaat.
    - DEEL_URL: het adres dat 'Deel de quiz' doorgeeft. Vul hier de pagina op takecarebnb.org in waar de quiz staat;
      zolang dit leeg is, wordt het adres van de losse quiz gedeeld.
    - Citaat per profiel: voeg in PROFILES quote: '...' en who: '...' toe; zonder quote wordt geen citaatblok getoond.
@@ -275,7 +275,7 @@ function render() {
       '<p class="soft" style="margin:14px 0 0;font-size:13px">Afmelden kan altijd. <a href="https://takecarebnb.org/privacy-voorwaarden/" target="_blank" rel="noopener" style="color:inherit">Privacybeleid</a>.</p>' +
     '</div>' +
 
-    '<a class="btn ghost" href="' + INFO_URL + '" target="_top">Meer info over gastgezinnen</a>' +
+    '<a class="btn ghost" href="' + INFO_URL + '" target="_top">Meer info voor gastgezinnen</a>' +
     '<div class="share"><p class="soft" style="margin:0">Benieuwd wat voor gastgezin je vrienden zijn? <a class="back" id="shareWa" target="_blank" rel="noopener">Deel de quiz via WhatsApp</a></p></div>';
   stage.appendChild(s);
   document.getElementById('send').addEventListener('click', submitLead);
