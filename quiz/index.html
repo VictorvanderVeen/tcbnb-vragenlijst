@@ -136,12 +136,18 @@
    - DEEL_URL: het adres dat 'Deel de quiz' doorgeeft. Vul hier de pagina op takecarebnb.org in waar de quiz staat;
      zolang dit leeg is, wordt het adres van de losse quiz gedeeld.
    - Citaat per profiel: voeg in PROFILES quote: '...' en who: '...' toe; zonder quote wordt geen citaatblok getoond.
+   - Per embed via de iframe-URL: ?plek=blog zet 'blog' vóór de bron in de inzending (zo zie je waar de lead vandaan komt);
+     &lead=uit verbergt het e-mailblok, dan is het alleen een quiz.
 ──────────────────────────────────────────────────────────────── */
 var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/pbc_2925231353/records'; // id van tcbnb_quiz_inzendingen: blijft werken als de collectie wordt hernoemd
 var ENDPOINT = '';
 var INFO_URL = 'https://takecarebnb.org/informatie-voor-gastgezinnen/';
 
 var DEEL_URL = 'https://takecarebnb.org/wat-voor-een-gastgezin-ben-jij/';
+
+var params = new URLSearchParams(location.search);
+var PLEK = (params.get('plek') || '').slice(0, 40);
+var LEAD_UIT = params.get('lead') === 'uit';
 
 var PROFILES = {
   K: {
@@ -264,7 +270,8 @@ function render() {
     '<p>' + p.fit + '</p>' +
     (p.quote ? '<blockquote class="quote">' + p.quote + (p.who ? '<cite>' + p.who + '</cite>' : '') + '</blockquote>' : '') +
 
-    /* zachte leadvraag, per profiel een eigen reden */
+    /* zachte leadvraag, per profiel een eigen reden; weg bij ?lead=uit */
+    (LEAD_UIT ? '' :
     '<div id="leadbox" style="background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin:8px 0 26px">' +
       '<h2 style="font-size:22px;margin-bottom:8px">' + p.hook + '</h2>' +
       '<p class="soft" style="margin-bottom:14px">Ontvang 3 korte verhalen van gastgezinnen zoals jij.</p>' +
@@ -273,12 +280,12 @@ function render() {
       '<p class="err" id="err">Vul een geldig e-mailadres in.</p>' +
       '<div class="nav" style="margin-top:6px"><button class="btn" id="send">Stuur me de verhalen</button></div>' +
       '<p class="soft" style="margin:14px 0 0;font-size:13px">Afmelden kan altijd. <a href="https://takecarebnb.org/privacy-voorwaarden/" target="_blank" rel="noopener" style="color:inherit">Privacybeleid</a>.</p>' +
-    '</div>' +
+    '</div>') +
 
     '<a class="btn ghost" href="' + INFO_URL + '" target="_top">Meer info voor gastgezinnen</a>' +
     '<div class="share"><p class="soft" style="margin:0">Benieuwd wat voor gastgezin je vrienden zijn? <a class="back" id="shareWa" target="_blank" rel="noopener">Deel de quiz via WhatsApp</a></p></div>';
   stage.appendChild(s);
-  document.getElementById('send').addEventListener('click', submitLead);
+  if (!LEAD_UIT) document.getElementById('send').addEventListener('click', submitLead);
   /* Delen gaat via een gewone WhatsApp-link: die werkt ook in een iframe, waar de browser het deelvenster blokkeert. */
   var deelUrl = DEEL_URL || location.href.split('?')[0];
   document.getElementById('shareWa').href = 'https://wa.me/?text=' + encodeURIComponent('Ik ben ' + p.name + '. Hoe gastvrij ben jij? ' + deelUrl);
@@ -306,7 +313,7 @@ function submitLead() {
     profiel: PROFILES[result()].name,
     antwoorden: answers.join(''),
     laatste_vraag: QUESTIONS[7].a.filter(function (o) { return o[1] === answers[7]; })[0][0],
-    bron: document.referrer || 'direct'
+    bron: (PLEK ? PLEK + ' · ' : '') + (document.referrer || 'direct')
   };
 
   var btn = document.getElementById('send');
