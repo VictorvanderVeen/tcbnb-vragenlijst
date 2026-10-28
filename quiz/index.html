@@ -146,7 +146,7 @@ var INFO_URL = 'https://takecarebnb.org/informatie-voor-gastgezinnen/';
 var DEEL_URL = 'https://takecarebnb.org/wat-voor-een-gastgezin-ben-jij/';
 
 var params = new URLSearchParams(location.search);
-var PLEK = (params.get('plek') || '').slice(0, 40);
+var PLEK = (params.get('plek') || '').slice(0, 100); // embedcode vult hier het paginapad in
 var LEAD_UIT = params.get('lead') === 'uit';
 
 var PROFILES = {
