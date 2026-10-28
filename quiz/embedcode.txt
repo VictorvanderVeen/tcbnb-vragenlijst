@@ -4,7 +4,9 @@
      Werkt naast de vragenlijst-embed: elk script luistert alleen naar zijn eigen iframe.
      Dezelfde code werkt op elke pagina: het script geeft het paginapad als 'plek' mee aan de inzending.
      Eigen label in plaats van het pad: .../quiz/?plek=blog in data-src.
-     Alleen de quiz, zonder e-mailblok: .../quiz/?lead=uit in data-src. -->
+     Alleen de quiz, zonder e-mailblok: .../quiz/?lead=uit in data-src.
+     Utm-codes uit de advertentielink gaan mee naar de quiz. Klikt iemand eerst door naar een andere pagina,
+     dan onthoudt de browser ze tot het tabblad dichtgaat. -->
 <iframe id="tcbnb-quiz" data-src="https://victorvanderveen.github.io/tcbnb-vragenlijst/quiz/" title="Quiz: Hoe gastvrij ben jij?" style="width:100%;height:700px;border:0;display:block" loading="lazy"></iframe>
 <script>
 (function () {
@@ -12,6 +14,14 @@
   // src pas hier zetten, zodat de quiz meteen met de juiste plek laadt (en niet twee keer)
   var u = new URL(f.getAttribute('data-src'));
   if (!u.searchParams.get('plek')) u.searchParams.set('plek', location.pathname);
+  // utm-codes van deze pagina, anders die van eerder in dit bezoek
+  var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'], hier = new URLSearchParams(location.search), utm = {};
+  keys.forEach(function (k) { if (hier.get(k)) utm[k] = hier.get(k); });
+  try {
+    if (utm.utm_source) sessionStorage.setItem('tcbnb_utm', JSON.stringify(utm));
+    else utm = JSON.parse(sessionStorage.getItem('tcbnb_utm') || '{}');
+  } catch (e) {}
+  keys.forEach(function (k) { if (utm[k]) u.searchParams.set(k, utm[k]); });
   f.src = u.toString();
   window.addEventListener('message', function (e) {
     if (e.source !== f.contentWindow || !e.data) return; // alleen berichten van déze quiz

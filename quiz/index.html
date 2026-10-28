@@ -138,6 +138,8 @@
    - Citaat per profiel: voeg in PROFILES quote: '...' en who: '...' toe; zonder quote wordt geen citaatblok getoond.
    - Per embed via de iframe-URL: ?plek=blog zet 'blog' vóór de bron in de inzending (zo zie je waar de lead vandaan komt);
      &lead=uit verbergt het e-mailblok, dan is het alleen een quiz.
+   - utm_source/utm_medium/utm_campaign/utm_content uit de advertentielink geeft de embedcode door; ze komen als
+     eigen velden in de inzending, zodat elke lead aan een advertentie hangt (ook zonder cookie-toestemming).
 ──────────────────────────────────────────────────────────────── */
 var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/pbc_2925231353/records'; // id van tcbnb_quiz_inzendingen: blijft werken als de collectie wordt hernoemd
 var ENDPOINT = '';
@@ -148,6 +150,8 @@ var DEEL_URL = 'https://takecarebnb.org/wat-voor-een-gastgezin-ben-jij/';
 var params = new URLSearchParams(location.search);
 var PLEK = (params.get('plek') || '').slice(0, 100); // embedcode vult hier het paginapad in
 var LEAD_UIT = params.get('lead') === 'uit';
+var UTM = {};
+['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) { UTM[k] = (params.get(k) || '').slice(0, 200); });
 
 var PROFILES = {
   K: {
@@ -313,7 +317,8 @@ function submitLead() {
     profiel: PROFILES[result()].name,
     antwoorden: answers.join(''),
     laatste_vraag: QUESTIONS[7].a.filter(function (o) { return o[1] === answers[7]; })[0][0],
-    bron: (PLEK ? PLEK + ' · ' : '') + (document.referrer || 'direct')
+    bron: (PLEK ? PLEK + ' · ' : '') + (document.referrer || 'direct'),
+    utm_source: UTM.utm_source, utm_medium: UTM.utm_medium, utm_campaign: UTM.utm_campaign, utm_content: UTM.utm_content
   };
 
   var btn = document.getElementById('send');
