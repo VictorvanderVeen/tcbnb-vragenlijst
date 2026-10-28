@@ -6,7 +6,8 @@
      Eigen label in plaats van het pad: .../quiz/?plek=blog in data-src.
      Alleen de quiz, zonder e-mailblok: .../quiz/?lead=uit in data-src.
      Utm-codes uit de advertentielink gaan mee naar de quiz. Klikt iemand eerst door naar een andere pagina,
-     dan onthoudt de browser ze tot het tabblad dichtgaat. -->
+     dan onthoudt de browser ze tot het tabblad dichtgaat. Meta's klikcode (fbclid) gaat op dezelfde manier mee.
+     De pixel krijgt het event-ID van de quiz, zodat Meta de lead niet dubbel telt naast de Conversions API. -->
 <iframe id="tcbnb-quiz" data-src="https://victorvanderveen.github.io/tcbnb-vragenlijst/quiz/" title="Quiz: Hoe gastvrij ben jij?" style="width:100%;height:700px;border:0;display:block" loading="lazy"></iframe>
 <script>
 (function () {
@@ -15,10 +16,10 @@
   var u = new URL(f.getAttribute('data-src'));
   if (!u.searchParams.get('plek')) u.searchParams.set('plek', location.pathname);
   // utm-codes van deze pagina, anders die van eerder in dit bezoek
-  var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'], hier = new URLSearchParams(location.search), utm = {};
+  var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'fbclid'], hier = new URLSearchParams(location.search), utm = {};
   keys.forEach(function (k) { if (hier.get(k)) utm[k] = hier.get(k); });
   try {
-    if (utm.utm_source) sessionStorage.setItem('tcbnb_utm', JSON.stringify(utm));
+    if (utm.utm_source || utm.fbclid) sessionStorage.setItem('tcbnb_utm', JSON.stringify(utm));
     else utm = JSON.parse(sessionStorage.getItem('tcbnb_utm') || '{}');
   } catch (e) {}
   keys.forEach(function (k) { if (utm[k]) u.searchParams.set(k, utm[k]); });
@@ -30,7 +31,7 @@
     if (d.tcbnbTop && f.getBoundingClientRect().top < 0) window.scrollBy(0, f.getBoundingClientRect().top - 16);
     if (d.tcbnbLead) {
       // De pixel laadt via GTM na cookie-toestemming; zonder toestemming is er geen fbq en tellen we niets
-      if (window.fbq) fbq('track', 'Lead', { content_name: 'Quiz gastvrij', content_category: d.tcbnbLead.profiel });
+      if (window.fbq) fbq('track', 'Lead', { content_name: 'Quiz gastvrij', content_category: d.tcbnbLead.profiel }, { eventID: d.tcbnbLead.eventId });
       (window.dataLayer = window.dataLayer || []).push({ event: 'tcbnb_quiz_lead', profiel: d.tcbnbLead.profiel });
     }
   });

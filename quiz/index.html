@@ -140,6 +140,8 @@
      &lead=uit verbergt het e-mailblok, dan is het alleen een quiz.
    - utm_source/utm_medium/utm_campaign/utm_content uit de advertentielink geeft de embedcode door; ze komen als
      eigen velden in de inzending, zodat elke lead aan een advertentie hangt (ook zonder cookie-toestemming).
+   - fbclid (Meta's klikcode) en een eigen event_id gaan ook mee: de server meldt de lead daarmee via de
+     Conversions API aan Meta, en de pixel krijgt hetzelfde event_id zodat Meta hem niet dubbel telt.
 ──────────────────────────────────────────────────────────────── */
 var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/pbc_2925231353/records'; // id van tcbnb_quiz_inzendingen: blijft werken als de collectie wordt hernoemd
 var ENDPOINT = '';
@@ -152,6 +154,7 @@ var PLEK = (params.get('plek') || '').slice(0, 100); // embedcode vult hier het 
 var LEAD_UIT = params.get('lead') === 'uit';
 var UTM = {};
 ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) { UTM[k] = (params.get(k) || '').slice(0, 200); });
+var FBCLID = (params.get('fbclid') || '').slice(0, 500);
 
 var PROFILES = {
   K: {
@@ -318,7 +321,10 @@ function submitLead() {
     antwoorden: answers.join(''),
     laatste_vraag: QUESTIONS[7].a.filter(function (o) { return o[1] === answers[7]; })[0][0],
     bron: (PLEK ? PLEK + ' · ' : '') + (document.referrer || 'direct'),
-    utm_source: UTM.utm_source, utm_medium: UTM.utm_medium, utm_campaign: UTM.utm_campaign, utm_content: UTM.utm_content
+    utm_source: UTM.utm_source, utm_medium: UTM.utm_medium, utm_campaign: UTM.utm_campaign, utm_content: UTM.utm_content,
+    fbclid: FBCLID,
+    event_id: 'tcbnb-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10),
+    user_agent: navigator.userAgent.slice(0, 500)
   };
 
   var btn = document.getElementById('send');
@@ -328,7 +334,7 @@ function submitLead() {
     document.getElementById('leadbox').innerHTML =
       '<h2 style="font-size:22px;margin-bottom:6px">Dank je' + (name ? ', ' + esc(name) : '') + '.</h2>' +
       '<p class="soft" style="margin:0">De verhalen komen eraan.' + (call ? ' En we bellen je binnenkort.' : '') + '</p>';
-    toOuder({ tcbnbLead: { profiel: payload.profiel } });
+    toOuder({ tcbnbLead: { profiel: payload.profiel, eventId: payload.event_id } });
   }
   if (ENDPOINT.indexOf('VUL-IN') !== -1) { done(); return; } // preview
 
