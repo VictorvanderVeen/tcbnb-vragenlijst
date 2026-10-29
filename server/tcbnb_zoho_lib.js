@@ -1,6 +1,6 @@
 // Zoho Campaigns-koppeling voor de Takecarebnb-quiz.
 // tcbnb_zoho.env bevat: ZOHO_DC (eu of com), ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REFRESH_TOKEN,
-// ZOHO_LISTKEY en optioneel ZOHO_EXTRA_VELDEN=ja (stuurt Profiel en Mag bellen mee; die velden moeten in Zoho bestaan).
+// en ZOHO_LISTKEY.
 
 function leesEnv() {
   const tekst = toString($os.readFile(__hooks + "/../tcbnb_zoho.env"));
@@ -44,10 +44,8 @@ function stuurNaarZoho(env, record) {
     "First Name": record.getString("voornaam"),
   };
   if (record.getString("telefoon")) contact["Phone"] = record.getString("telefoon");
-  if (env.ZOHO_EXTRA_VELDEN === "ja") {
-    contact["Profiel"] = record.getString("profiel");
-    contact["Mag bellen"] = record.getBool("mag_bellen") ? "ja" : "nee";
-  }
+  // Keuzelijst in Zoho met precies de vier quizuitslagen (Het Grote Hart, De Wegwijzer, ...)
+  if (record.getString("profiel")) contact["Gastgezintype"] = record.getString("profiel");
 
   const res = $http.send({
     method: "POST",
