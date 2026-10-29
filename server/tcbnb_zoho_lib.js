@@ -63,6 +63,10 @@ function stuurNaarZoho(env, record) {
   if (res.statusCode !== 200 || !res.json || res.json.status !== "success") {
     throw new Error("listsubscribe mislukt: " + res.statusCode + " " + toString(res.body));
   }
+  // Staat dubbele opt-in (weer) aan, dan meldt Zoho ook success maar staat het contact nog niet in de lijst
+  if (String(res.json.message).indexOf("confirm") !== -1) {
+    $app.logger().warn("tcbnb zoho", "melding", "dubbele opt-in staat aan in Zoho, contact wacht op bevestiging", "id", record.id);
+  }
 }
 
 module.exports = { leesEnv, stuurNaarZoho };
