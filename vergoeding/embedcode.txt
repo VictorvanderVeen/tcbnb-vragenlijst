@@ -1,0 +1,15 @@
+<!-- Embedcode voor de vragenlijst over de vrijwilligersvergoeding. Plak dit in een HTML-blok op een pagina van takecarebnb.org.
+     De iframe groeit mee met de vragenlijst en scrolt na elke vraag terug naar het begin.
+     Werkt naast de quiz en de oude vragenlijst: het script luistert alleen naar zijn eigen iframe.
+     Eigen label per plek (bijv. vanuit de nieuwsbrief): zet ?plek=nieuwsbrief achter het adres in src. -->
+<iframe id="tcbnb-vergoeding" src="https://victorvanderveen.github.io/tcbnb-vragenlijst/vergoeding/" title="Vragenlijst: even over geld" style="width:100%;height:700px;border:0;display:block"></iframe>
+<script>
+(function () {
+  var f = document.getElementById('tcbnb-vergoeding');
+  window.addEventListener('message', function (e) {
+    if (e.source !== f.contentWindow || !e.data) return;
+    if (e.data.tcbnbHeight) f.style.height = e.data.tcbnbHeight + 'px';
+    if (e.data.tcbnbTop && f.getBoundingClientRect().top < 0) window.scrollBy(0, f.getBoundingClientRect().top - 16);
+  });
+})();
+</script>
