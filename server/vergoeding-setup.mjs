@@ -32,8 +32,7 @@ const created = { name: 'created', type: 'autodate', onCreate: true, onUpdate: f
 const COLLECTIES = {
   tcbnb_vergoeding_antwoorden: [
     tekst('voornaam', 60),
-    tekst('situatie'),
-    { name: 'wist_van_vergoeding', type: 'bool' },
+    tekst('wist_van_vergoeding', 40),
     { name: 'nog_gastgezin', type: 'bool' },
     tekst('leeftijd', 40),
     tekst('huishouden', 60),

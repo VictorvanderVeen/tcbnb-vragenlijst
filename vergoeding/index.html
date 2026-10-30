@@ -135,20 +135,14 @@ var PB = 'https://db.vdveen.online/api/collections/';
 var params = new URLSearchParams(location.search);
 var PLEK = (params.get('plek') || '').slice(0, 100);
 
-var WIST = 'Ik wist van de vergoeding toen ik me aanmeldde';
-var NIET = 'Ik wist het toen nog niet';
-
 var Q = {
-  situatie: { type: 'single', q: 'Wat past het best bij jou?', opts: [
-    WIST + ', en ik ben nog gastgezin',
-    NIET + ', en ik ben nog gastgezin',
-    WIST + ', en ik ben inmiddels gestopt',
-    NIET + ', en ik ben inmiddels gestopt'] },
+  gastgezin: { type: 'single', q: 'Ben je nu nog gastgezin?', opts: ['Ja', 'Nee, ik ben gestopt'] },
+  wist: { type: 'single', q: 'Wist je van de vergoeding toen je je aanmeldde?', opts: ['Ja', 'Nee', 'Weet ik niet meer'] },
   profiel: { type: 'duo', q: 'Wie ben je?', hint: 'Zo kunnen we zien of verschillende mensen er anders over denken.', parts: [
     { id: 'leeftijd', label: 'Hoe oud ben je?', opts: ['Onder 40', '40–54', '55–66', '67 of ouder'] },
     { id: 'huishouden', label: 'Met wie woon je?', opts: ['Alleen', 'Met partner', 'Met partner en kinderen', 'Alleen met kinderen', 'Anders'] }] },
   hoogte: { type: 'single', q: 'Wat vind je van de hoogte van de vergoeding?', opts: [
-    'Te laag', 'Precies goed', 'Te hoog', 'Daar heb ik nooit over nagedacht'] },
+    'Te laag', 'Precies goed', 'Te hoog', 'Ik weet niet meer hoe hoog hij was'] },
   betekenis: { type: 'multi', max: 2, q: 'Wat betekent de vergoeding vooral voor je?', hint: 'Kies er maximaal twee.', opts: [
     'Ik voel me gezien in wat ik doe', 'Het is een mooi gebaar van de overheid', 'Het dekt de kosten die ik maak',
     'Ik heb het geld echt nodig', 'Het is een leuk extraatje', 'Het maakt me eigenlijk niet zoveel uit'] },
@@ -177,11 +171,11 @@ var KEYS = 'ABCDEFGHIJK';
 var stage = document.getElementById('stage');
 var bar = document.getElementById('bar');
 
-function wist() { return (A.situatie || '').indexOf(WIST) === 0; }
-function gestopt() { return /gestopt$/.test(A.situatie || ''); }
+function wist() { return A.wist === 'Ja'; }
+function gestopt() { return A.gastgezin === 'Nee, ik ben gestopt'; }
 function seq() {
-  var s = ['situatie', 'profiel', 'hoogte', 'betekenis'];
-  if (!A.situatie || wist()) s.push('zonder');
+  var s = ['gastgezin', 'wist', 'profiel', 'hoogte', 'betekenis'];
+  if (!A.wist || wist()) s.push('zonder'); // alleen wie het wist, kan erdoor over de streep zijn getrokken
   s.push(gestopt() ? 'waarom' : 'stopt');
   return s.concat(['lastig', 'onverwacht', 'nieuws']);
 }
@@ -391,8 +385,7 @@ function payload() {
   var w = gestopt();
   return {
     voornaam: naam,
-    situatie: A.situatie,
-    wist_van_vergoeding: wist(),
+    wist_van_vergoeding: A.wist,
     nog_gastgezin: !w,
     leeftijd: A.leeftijd, huishouden: A.huishouden,
     hoogte: A.hoogte,
