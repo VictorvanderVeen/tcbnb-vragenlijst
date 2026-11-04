@@ -151,7 +151,7 @@ var Q = {
   stopt: { type: 'single', q: 'Stel, de vergoeding stopt. Wat doe je dan?', opts: [
     'Ik ga gewoon door', 'Ik ga door, maar minder vaak of korter', 'Ik stop', 'Weet ik nog niet'] },
   waarom: { type: 'single', q: 'Waarom ben je gestopt?', opts: [
-    'Mijn gast is vertrokken en ik neem geen nieuwe', 'Persoonlijke omstandigheden', 'Het kostte me meer dan het opleverde',
+    'Mijn gast is vertrokken en ik wil geen nieuwe gast laten logeren', 'Persoonlijke omstandigheden', 'Het kostte me meer dan het opleverde',
     'Gedoe rond de vergoeding', { t: 'Anders, namelijk…', anders: true }] },
   lastig: { type: 'multi', max: 3, q: 'Wat maakt gastgezin zijn soms lastig?', hint: 'Kies er maximaal drie.', opts: [
     'Mijn gast moet zich op mijn adres inschrijven', 'Mijn huis is eigenlijk te klein', 'Ik heb minder privacy',
@@ -199,7 +199,7 @@ function render() {
   var id = s[step], item = Q[id];
   var eyebrow = id === 'nieuws' ? 'Klaar!'
     : step === vragen - 1 ? 'Laatste vraag' + (naam ? ', ' + esc(naam) : '')
-    : 'Vraag ' + (step + 1) + ' van ' + vragen;
+    : 'Vraag ' + (step + 1);
   var head = '<span class="eyebrow">' + eyebrow + '</span>' + (item.q ? '<h2>' + item.q + '</h2>' : '') +
     (item.hint ? '<p class="hint">' + item.hint + '</p>' : '<div style="height:14px"></div>');
   var back = '<button class="back" id="back">Vorige</button>';
@@ -219,8 +219,8 @@ function intro(el) {
     '<span class="eyebrow">Takecarebnb</span>' +
     '<h1>Even over geld</h1>' +
     '<p>Vorige keer vertelden heel veel gastgezinnen ons hun verhaal. Dank je wel daarvoor! Nu hebben we nog een andere vraag: wat betekende de vrijwilligersvergoeding voor jou?</p>' +
-    '<p>Over geld praten voelt soms ongemakkelijk. Toch helpt het ons als je eerlijk bent. Of de vergoeding nu het verschil maakte of nauwelijks iets uitmaakte. Het ministerie gebruikt jullie antwoorden om de proef met deze vergoeding te evalueren.</p>' +
-    '<p class="soft">Ongeveer 5 minuten.</p>' +
+    '<p>Over geld praten voelt soms ongemakkelijk. Toch helpt het ons als je eerlijk bent. Of de vergoeding nu het verschil maakte of nauwelijks iets uitmaakte. Het ministerie van Justitie en Veiligheid gebruikt jullie antwoorden om de proef met deze vergoeding te evalueren.</p>' +
+    '<p class="soft">Het invullen van deze vragen duurt ongeveer 5 minuten.</p>' +
     '<label class="f" style="margin-top:22px"><span>Hoe mogen we je noemen?</span><input type="text" id="naam" autocomplete="given-name" placeholder="Je voornaam" maxlength="60" value="' + esc(naam) + '"></label>' +
     '<p class="soft" style="margin-top:-6px">Mag ook leeg blijven.</p>' +
     '<div class="nav"><button class="btn" id="start">Ik doe mee</button></div>';
