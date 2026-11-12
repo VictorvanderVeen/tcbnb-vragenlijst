@@ -63,6 +63,10 @@
   .legal a { color: inherit; }
 
   .done { animation: in .3s ease both; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--ink); text-decoration: none; }
+  a.btn { text-decoration: none; }
+  .geruststel { margin: 0 0 18px; padding-left: 20px; }
+  .geruststel li { margin-bottom: 10px; }
   @keyframes in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -73,7 +77,7 @@
   <form id="form" novalidate>
     <span class="eyebrow">Vrijblijvend</span>
     <h1>Wil je meer weten over gastgezin worden?</h1>
-    <p>Laat je gegevens achter. We sturen je de informatiefolder, of we bellen je even. Jij kiest.</p>
+    <p>Laat je gegevens achter. Je krijgt meteen de informatiefolder. Liever even praten? Dan bellen we je.</p>
 
 
     <label class="f"><span>Voornaam</span><input type="text" id="voornaam" autocomplete="given-name" required></label>
@@ -109,6 +113,8 @@
    - event_id gaat mee naar de server (Conversions API) én naar de ouderpagina (pixel), zodat Meta niet dubbel telt.
 ──────────────────────────────────────────────────────────────── */
 var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/pbc_3420092994/records'; // id van tcbnb_info_aanvragen: blijft werken als de collectie wordt hernoemd
+var FOLDER_URL = 'https://victorvanderveen.github.io/tcbnb-vragenlijst/info/folder-gastgezin-worden.pdf';
+var INSCHRIJVEN_URL = 'https://takecarebnb.org/inschrijven-gastgezinnen/';
 
 var params = new URLSearchParams(location.search);
 var PLEK = (params.get('plek') || '').slice(0, 100);
@@ -167,14 +173,23 @@ $('form').addEventListener('submit', function (e) {
   btn.disabled = true; btn.textContent = 'Even geduld…';
 
   function done() {
+    /* bedankscherm = de folder zelf: geen mail aan de aanvrager nodig */
+    var folderKnop = '<p style="margin:22px 0"><a class="btn" href="' + FOLDER_URL + '" target="_blank" rel="noopener">Bekijk de folder (pdf)</a></p>';
     $('stage').innerHTML =
       '<div class="done"><span class="eyebrow">Gelukt</span>' +
-      '<h1>Dank je, ' + esc(voornaam) + '.</h1>' +
       (bel
-        ? '<p>We bellen je binnen een paar werkdagen' + (dagdeel ? ' in de ' + dagdeel : '') + '.</p>' +
-          '<p class="soft">De folder staat alvast in je mail, op ' + esc(email) + '.</p>'
-        : '<p>De folder staat binnen een paar minuten in je mail, op ' + esc(email) + '.</p>' +
-          '<p class="soft">Niks gezien? Kijk even bij je reclame of ongewenste mail.</p>') +
+        ? '<h1>We bellen je snel, ' + esc(voornaam) + '.</h1>' +
+          '<p>Dank je voor je aanvraag. Lidwien belt je binnen een paar werkdagen' + (dagdeel ? ', in de ' + dagdeel + ' zoals je aangaf' : '') + '.</p>' +
+          '<p>Alvast lezen? Hier is de folder:</p>' + folderKnop +
+          '<p>Schrijf gerust je vragen op. In het gesprek is er alle ruimte voor: hoeveel tijd het kost, wat het kost, wat als het niet klikt. Niets is een rare vraag.</p>'
+        : '<h1>Hier is je folder, ' + esc(voornaam) + '.</h1>' + folderKnop +
+          '<p>Drie dingen die nieuwe gastgezinnen vaak geruststellen:</p>' +
+          '<ul class="geruststel">' +
+          '<li><b>Je zegt bij elke stap ja of nee.</b> Eerst een kennismaking bij jou thuis. Daarna een weekend proeflogeren. Pas als dat goed voelt, worden de koffers gepakt.</li>' +
+          '<li><b>Je staat er niet alleen voor.</b> Een matchmaker bij jou in de buurt zoekt een gast die bij je past, en blijft betrokken zolang het logeren duurt.</li>' +
+          '<li><b>Niets moet, alles mag.</b> Samen eten of ieder z\'n eigen ritme? Dat spreek je samen af.</li></ul>' +
+          '<p>Klinkt het goed?</p><p style="margin:14px 0 22px"><a class="btn ghost" href="' + INSCHRIJVEN_URL + '" target="_top">Meld je vrijblijvend aan</a></p>' +
+          '<p class="soft">Liever eerst even praten? Bel 085-7731121 (dinsdag en donderdag, 9.00–17.00 uur) of mail <a href="mailto:info@takecarebnb.org" style="color:inherit">info@takecarebnb.org</a>.</p>') +
       '</div>';
     toOuder({ tcbnbContact: { route: payload.route, eventId: payload.event_id } });
     toOuder({ tcbnbTop: true });
