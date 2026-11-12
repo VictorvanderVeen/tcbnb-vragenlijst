@@ -43,7 +43,9 @@
 
   /* dagdeel: verschijnt pas als er een nummer staat */
   .when { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .3s ease, opacity .25s ease; }
-  .when.open { max-height: 140px; opacity: 1; }
+  .when.open { max-height: 260px; opacity: 1; }
+  .check.bel { font-size: 16px; margin: 4px 0 14px; }
+  .check.bel .soft { font-size: 14px; }
   .when > span { display: block; font-weight: 500; margin-bottom: 8px; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
   .chips button { font: inherit; font-size: 15px; color: var(--ink); background: var(--field); border: 1.5px solid var(--line); border-radius: 999px; padding: 8px 18px; cursor: pointer; }
@@ -77,17 +79,17 @@
   <form id="form" novalidate>
     <span class="eyebrow">Vrijblijvend</span>
     <h1>Wil je meer weten over gastgezin worden?</h1>
-    <p>Laat je gegevens achter. Je krijgt meteen de informatiefolder. Liever even praten? Dan bellen we je.</p>
+    <p>Laat je naam en e-mailadres achter. Je krijgt meteen de informatiefolder.</p>
 
 
     <label class="f"><span>Voornaam</span><input type="text" id="voornaam" autocomplete="given-name" required></label>
     <label class="f"><span>E-mailadres</span><input type="email" id="email" autocomplete="email" required></label>
     <p class="err" id="errMail">Vul je voornaam en een geldig e-mailadres in.</p>
-    <label class="f"><span>Telefoonnummer <em>(niet verplicht)</em></span><input type="tel" id="telefoon" autocomplete="tel" inputmode="tel">
-      <span class="hint" id="telHint">Liever even praten? Vul je nummer in, dan bellen we je.</span></label>
-    <p class="err" id="errTel">Dit nummer lijkt niet te kloppen. Kijk je het even na?</p>
+    <label class="check bel"><input type="checkbox" id="belMe"> <span><b>Bel me even voor een kort gesprek</b><br><span class="soft">Niet nodig voor de folder.</span></span></label>
 
     <div class="when" id="when">
+      <label class="f"><span>Telefoonnummer</span><input type="tel" id="telefoon" autocomplete="tel" inputmode="tel" disabled></label>
+      <p class="err" id="errTel">Vul een telefoonnummer in waarop we je kunnen bellen.</p>
       <span>Wanneer kunnen we je het best bellen?</span>
       <div class="chips" id="chips">
         <button type="button" data-v="ochtend" aria-pressed="false">Ochtend</button>
@@ -98,6 +100,7 @@
 
     <label class="check"><input type="checkbox" id="nieuwsbrief"> Stuur me ook de nieuwsbrief (tien keer per jaar)</label>
 
+    <p class="err" id="errSend">Versturen lukte niet. Probeer het nog een keer.</p>
     <button class="btn" id="send" type="submit">Stuur me de folder</button>
     <p class="soft legal">We gebruiken je gegevens alleen om je informatie te sturen. <a href="https://takecarebnb.org/privacy-voorwaarden/" target="_blank" rel="noopener">Privacybeleid</a>.</p>
   </form>
@@ -108,7 +111,7 @@
    INSTELLINGEN
    - POCKETBASE_ENDPOINT: collectie tcbnb_info_aanvragen op db.vdveen.online (aanmaken: server/info-setup.mjs).
      Zolang hier 'VUL-IN' in staat, draait het formulier in preview-modus en wordt niets verzonden.
-   - Routing zit in de data zelf: telefoon ingevuld = bellen, leeg = folder per mail. Geen aparte keuzevraag.
+   - Routing: vinkje 'Bel me even' aan = bellen (telefoon verplicht), uit = alleen folder op het bedankscherm.
    - utm_*, fbclid en plek komen via de iframe-URL (zelfde embedcode als de quiz).
    - event_id gaat mee naar de server (Conversions API) én naar de ouderpagina (pixel), zodat Meta niet dubbel telt.
 ──────────────────────────────────────────────────────────────── */
@@ -128,18 +131,22 @@ var dagdeel = '';
 function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 function telOk(t) { var d = t.replace(/[^\d]/g, ''); return d.length >= 9 && d.length <= 15; }
 
-/* telefoonveld stuurt de hele pagina: route-kaartje, dagdeel en knoptekst */
-function syncTel() {
-  var bel = $('telefoon').value.trim() !== '';
+/* Bellen is een bewuste keuze via het vinkje. Het telefoonveld staat uit (disabled) tot het vinkje aan staat,
+   zodat automatisch invullen door de browser niemand per ongeluk een belverzoek maakt. */
+function syncBel() {
+  var bel = $('belMe').checked;
   $('when').classList.toggle('open', bel);
+  $('telefoon').disabled = !bel;
   $('send').textContent = bel ? 'Bel me en stuur de folder' : 'Stuur me de folder';
-  if (!bel) { dagdeel = ''; setChips(); }
+  if (bel) $('telefoon').focus();
+  else { dagdeel = ''; setChips(); $('errTel').classList.remove('show'); }
   sendHeight();
 }
 function setChips() {
   document.querySelectorAll('#chips button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.v === dagdeel ? 'true' : 'false'); });
 }
-$('telefoon').addEventListener('input', syncTel);document.querySelectorAll('#chips button').forEach(function (b) {
+$('belMe').addEventListener('change', syncBel);
+document.querySelectorAll('#chips button').forEach(function (b) {
   b.addEventListener('click', function () { dagdeel = dagdeel === b.dataset.v ? '' : b.dataset.v; setChips(); });
 });
 
@@ -147,13 +154,14 @@ $('form').addEventListener('submit', function (e) {
   e.preventDefault();
   var voornaam = $('voornaam').value.trim();
   var email = $('email').value.trim();
-  var telefoon = $('telefoon').value.trim();
-  var bel = telefoon !== '';
+  var bel = $('belMe').checked;
+  var telefoon = bel ? $('telefoon').value.trim() : ''; // zonder vinkje nooit een nummer opslaan
 
   var okMail = voornaam && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
   var okTel = !bel || telOk(telefoon);
   $('errMail').classList.toggle('show', !okMail);
   $('errTel').classList.toggle('show', !okTel);
+  $('errSend').classList.remove('show');
   if (!okMail || !okTel) return;
 
   var payload = {
@@ -201,7 +209,7 @@ $('form').addEventListener('submit', function (e) {
     body: JSON.stringify(payload)
   }).then(function (r) { if (!r.ok) throw 0; done(); }).catch(function () {
     btn.disabled = false; btn.textContent = label;
-    $('errTel').textContent = 'Versturen lukte niet. Probeer het nog een keer.'; $('errTel').classList.add('show');
+    $('errSend').classList.add('show');
   });
 });
 
