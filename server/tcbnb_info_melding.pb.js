@@ -52,7 +52,8 @@ onRecordAfterCreateSuccess((e) => {
         '<table style="border-collapse:collapse;font-size:15px">' +
         rij("Voornaam", esc(naam)) +
         rij("E-mail", '<a href="mailto:' + esc(email) + '" style="color:#004542">' + esc(email) + "</a>") +
-        rij("Telefoon", tel ? '<a href="tel:' + esc(tel.replace(/\s/g, "")) + '" style="color:#004542">' + esc(tel) + "</a>" : "") +
+        rij("Telefoon", tel ? '<a href="tel:' + esc(tel.replace(/\s/g, "")) + '" style="color:#004542">' + esc(tel) + "</a>" +
+          (bellen ? "" : ' <span style="font-weight:400;color:#a33a20">(wil niet gebeld worden)</span>') : "") +
         rij("Liefst bellen in de", esc(dagdeel)) +
         rij("Nieuwsbrief", r.getBool("nieuwsbrief") ? "ja, graag" : "nee") +
         "</table>" +

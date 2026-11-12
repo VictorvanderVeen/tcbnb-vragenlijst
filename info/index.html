@@ -85,11 +85,11 @@
     <label class="f"><span>Voornaam</span><input type="text" id="voornaam" autocomplete="given-name" required></label>
     <label class="f"><span>E-mailadres</span><input type="email" id="email" autocomplete="email" required></label>
     <p class="err" id="errMail">Vul je voornaam en een geldig e-mailadres in.</p>
+    <label class="f"><span>Telefoonnummer <em>(niet verplicht)</em></span><input type="tel" id="telefoon" autocomplete="tel" inputmode="tel"></label>
+    <p class="err" id="errTel">Vul een telefoonnummer in waarop we je kunnen bellen.</p>
     <label class="check bel"><input type="checkbox" id="belMe"> <span><b>Bel me even voor een kort gesprek</b><br><span class="soft">Niet nodig voor de folder.</span></span></label>
 
     <div class="when" id="when">
-      <label class="f"><span>Telefoonnummer</span><input type="tel" id="telefoon" autocomplete="tel" inputmode="tel" disabled></label>
-      <p class="err" id="errTel">Vul een telefoonnummer in waarop we je kunnen bellen.</p>
       <span>Wanneer kunnen we je het best bellen?</span>
       <div class="chips" id="chips">
         <button type="button" data-v="ochtend" aria-pressed="false">Ochtend</button>
@@ -111,7 +111,8 @@
    INSTELLINGEN
    - POCKETBASE_ENDPOINT: collectie tcbnb_info_aanvragen op db.vdveen.online (aanmaken: server/info-setup.mjs).
      Zolang hier 'VUL-IN' in staat, draait het formulier in preview-modus en wordt niets verzonden.
-   - Routing: vinkje 'Bel me even' aan = bellen (telefoon verplicht), uit = alleen folder op het bedankscherm.
+   - Routing: vinkje 'Bel me even' aan = bellen (telefoon verplicht), uit = alleen folder op het bedankscherm
+     (een ingevuld nummer wordt dan wel bewaard, maar er wordt niet gebeld).
    - utm_*, fbclid en plek komen via de iframe-URL (zelfde embedcode als de quiz).
    - event_id gaat mee naar de server (Conversions API) én naar de ouderpagina (pixel), zodat Meta niet dubbel telt.
 ──────────────────────────────────────────────────────────────── */
@@ -131,15 +132,14 @@ var dagdeel = '';
 function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 function telOk(t) { var d = t.replace(/[^\d]/g, ''); return d.length >= 9 && d.length <= 15; }
 
-/* Bellen is een bewuste keuze via het vinkje. Het telefoonveld staat uit (disabled) tot het vinkje aan staat,
-   zodat automatisch invullen door de browser niemand per ongeluk een belverzoek maakt. */
+/* Bellen is een bewuste keuze via het vinkje, niet via het telefoonveld: een nummer dat de browser automatisch
+   invult, maakt dus nooit een belverzoek. Het vinkje past de knop aan en toont de dagdeel-keuze. */
 function syncBel() {
   var bel = $('belMe').checked;
   $('when').classList.toggle('open', bel);
-  $('telefoon').disabled = !bel;
   $('send').textContent = bel ? 'Bel me en stuur de folder' : 'Stuur me de folder';
-  if (bel) $('telefoon').focus();
-  else { dagdeel = ''; setChips(); $('errTel').classList.remove('show'); }
+  if (bel && !$('telefoon').value.trim()) $('telefoon').focus();
+  if (!bel) { dagdeel = ''; setChips(); $('errTel').classList.remove('show'); }
   sendHeight();
 }
 function setChips() {
@@ -155,10 +155,11 @@ $('form').addEventListener('submit', function (e) {
   var voornaam = $('voornaam').value.trim();
   var email = $('email').value.trim();
   var bel = $('belMe').checked;
-  var telefoon = bel ? $('telefoon').value.trim() : ''; // zonder vinkje nooit een nummer opslaan
+  var telefoon = $('telefoon').value.trim(); // wordt ook zonder vinkje bewaard, maar dan is de route 'folder'
 
   var okMail = voornaam && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
-  var okTel = !bel || telOk(telefoon);
+  var okTel = bel ? telOk(telefoon) : (!telefoon || telOk(telefoon));
+  $('errTel').textContent = bel && !telefoon ? 'Vul een telefoonnummer in waarop we je kunnen bellen.' : 'Dit nummer lijkt niet te kloppen. Kijk je het even na?';
   $('errMail').classList.toggle('show', !okMail);
   $('errTel').classList.toggle('show', !okTel);
   $('errSend').classList.remove('show');
