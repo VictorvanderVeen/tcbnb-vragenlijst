@@ -1,0 +1,34 @@
+<!-- Embedcode voor het campagneformulier 'informatie aanvragen' op een eigen campagnepagina op takecarebnb.org.
+     Plak dit in een HTML-blok op die nieuwe pagina. Het bestaande formulier op /informatie-voor-gastgezinnen/ blijft gewoon staan.
+     De iframe groeit mee met het formulier, scrolt na versturen terug naar boven,
+     en telt een Meta-pixel Contact zodra iemand een aanvraag heeft verstuurd.
+     Utm-codes en Meta's klikcode (fbclid) uit de advertentielink gaan mee naar het formulier.
+     De pixel krijgt het event-ID van het formulier, zodat Meta de aanvraag niet dubbel telt naast de Conversions API. -->
+<iframe id="tcbnb-info" data-src="https://victorvanderveen.github.io/tcbnb-vragenlijst/info/" title="Informatie aanvragen" style="width:100%;height:640px;border:0;display:block" loading="lazy"></iframe>
+<script>
+(function () {
+  var f = document.getElementById('tcbnb-info');
+  var u = new URL(f.getAttribute('data-src'));
+  if (!u.searchParams.get('plek')) u.searchParams.set('plek', location.pathname);
+  // utm-codes van deze pagina, anders die van eerder in dit bezoek (gedeeld met de quiz-embed)
+  var keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'fbclid'], hier = new URLSearchParams(location.search), utm = {};
+  keys.forEach(function (k) { if (hier.get(k)) utm[k] = hier.get(k); });
+  try {
+    if (utm.utm_source || utm.fbclid) sessionStorage.setItem('tcbnb_utm', JSON.stringify(utm));
+    else utm = JSON.parse(sessionStorage.getItem('tcbnb_utm') || '{}');
+  } catch (e) {}
+  keys.forEach(function (k) { if (utm[k]) u.searchParams.set(k, utm[k]); });
+  f.src = u.toString();
+  window.addEventListener('message', function (e) {
+    if (e.source !== f.contentWindow || !e.data) return; // alleen berichten van dít formulier
+    var d = e.data;
+    if (d.tcbnbHeight) f.style.height = d.tcbnbHeight + 'px';
+    if (d.tcbnbTop && f.getBoundingClientRect().top < 0) window.scrollBy(0, f.getBoundingClientRect().top - 16);
+    if (d.tcbnbContact) {
+      // De pixel laadt via GTM na cookie-toestemming; zonder toestemming is er geen fbq en tellen we niets
+      if (window.fbq) fbq('track', 'Contact', { content_name: 'Informatie aanvragen', content_category: d.tcbnbContact.route }, { eventID: d.tcbnbContact.eventId });
+      (window.dataLayer = window.dataLayer || []).push({ event: 'tcbnb_info_aanvraag', route: d.tcbnbContact.route });
+    }
+  });
+})();
+</script>

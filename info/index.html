@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informatie voor gastgezinnen – Takecarebnb</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF5E4;
+    --ink: #004542;
+    --ink-soft: rgba(0, 69, 66, 0.62);
+    --line: rgba(0, 69, 66, 0.22);
+    --field: #FFFBF3;
+    --font: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+  .stage { max-width: 560px; margin: 0 auto; padding: 32px 24px 48px; }
+  html.embedded .stage { padding-top: 8px; }
+
+  h1 { font-weight: 800; font-size: clamp(28px, 6vw, 40px); line-height: 1.08; margin: 0 0 12px; }
+  h2 { font-weight: 800; font-size: 22px; line-height: 1.2; margin: 0 0 8px; }
+  p { margin: 0 0 14px; }
+  .soft { color: var(--ink-soft); font-size: 15px; }
+  .eyebrow { display: block; font-size: 13px; font-weight: 500; letter-spacing: .08em; color: var(--ink-soft); margin-bottom: 10px; text-transform: uppercase; }
+
+  form > p:first-of-type { margin-bottom: 26px; }
+
+  label.f { display: block; margin-bottom: 16px; }
+  label.f > span { display: block; font-weight: 500; margin-bottom: 6px; }
+  label.f em { font-style: normal; font-weight: 400; color: var(--ink-soft); font-size: 14px; }
+  input[type="text"], input[type="email"], input[type="tel"] {
+    width: 100%; font: inherit; color: var(--ink); background: var(--field);
+    border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  }
+  input:focus { outline: 3px solid var(--ink); outline-offset: 2px; border-color: var(--ink); }
+  .hint { display: block; font-size: 14px; color: var(--ink-soft); margin-top: 6px; }
+
+  /* dagdeel: verschijnt pas als er een nummer staat */
+  .when { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .3s ease, opacity .25s ease; }
+  .when.open { max-height: 140px; opacity: 1; }
+  .when > span { display: block; font-weight: 500; margin-bottom: 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .chips button { font: inherit; font-size: 15px; color: var(--ink); background: var(--field); border: 1.5px solid var(--line); border-radius: 999px; padding: 8px 18px; cursor: pointer; }
+  .chips button:hover, .chips button:focus-visible { border-color: var(--ink); outline: none; }
+  .chips button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; margin: 4px 0 22px; cursor: pointer; }
+  .check input { accent-color: var(--ink); width: 18px; height: 18px; margin-top: 3px; flex: 0 0 auto; }
+
+  .btn { display: inline-block; font: inherit; font-weight: 800; font-size: 18px; color: var(--bg); background: var(--ink); border: 0; border-radius: 999px; padding: 15px 30px; cursor: pointer; transition: transform .12s; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .btn:disabled { opacity: .55; cursor: default; transform: none; }
+  .err { color: #a33a20; font-size: 14px; margin: -6px 0 14px; display: none; }
+  .err.show { display: block; }
+  .legal { font-size: 13px; margin: 16px 0 0; }
+  .legal a { color: inherit; }
+
+  .done { animation: in .3s ease both; }
+  @keyframes in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<script>if (window.parent !== window) document.documentElement.classList.add('embedded');</script>
+<main class="stage" id="stage">
+  <form id="form" novalidate>
+    <span class="eyebrow">Vrijblijvend</span>
+    <h1>Wil je meer weten over gastgezin worden?</h1>
+    <p>Laat je gegevens achter. We sturen je de informatiefolder, of we bellen je even. Jij kiest.</p>
+
+
+    <label class="f"><span>Voornaam</span><input type="text" id="voornaam" autocomplete="given-name" required></label>
+    <label class="f"><span>E-mailadres</span><input type="email" id="email" autocomplete="email" required></label>
+    <p class="err" id="errMail">Vul je voornaam en een geldig e-mailadres in.</p>
+    <label class="f"><span>Telefoonnummer <em>(niet verplicht)</em></span><input type="tel" id="telefoon" autocomplete="tel" inputmode="tel">
+      <span class="hint" id="telHint">Liever even praten? Vul je nummer in, dan bellen we je.</span></label>
+    <p class="err" id="errTel">Dit nummer lijkt niet te kloppen. Kijk je het even na?</p>
+
+    <div class="when" id="when">
+      <span>Wanneer kunnen we je het best bellen?</span>
+      <div class="chips" id="chips">
+        <button type="button" data-v="ochtend" aria-pressed="false">Ochtend</button>
+        <button type="button" data-v="middag" aria-pressed="false">Middag</button>
+        <button type="button" data-v="avond" aria-pressed="false">Avond</button>
+      </div>
+    </div>
+
+    <label class="check"><input type="checkbox" id="nieuwsbrief"> Stuur me ook de nieuwsbrief (tien keer per jaar)</label>
+
+    <button class="btn" id="send" type="submit">Stuur me de folder</button>
+    <p class="soft legal">We gebruiken je gegevens alleen om je informatie te sturen. <a href="https://takecarebnb.org/privacy-voorwaarden/" target="_blank" rel="noopener">Privacybeleid</a>.</p>
+  </form>
+</main>
+
+<script>
+/* ────────────────────────────────────────────────────────────────
+   INSTELLINGEN
+   - POCKETBASE_ENDPOINT: collectie tcbnb_info_aanvragen op db.vdveen.online (aanmaken: server/info-setup.mjs).
+     Zolang hier 'VUL-IN' in staat, draait het formulier in preview-modus en wordt niets verzonden.
+   - Routing zit in de data zelf: telefoon ingevuld = bellen, leeg = folder per mail. Geen aparte keuzevraag.
+   - utm_*, fbclid en plek komen via de iframe-URL (zelfde embedcode als de quiz).
+   - event_id gaat mee naar de server (Conversions API) én naar de ouderpagina (pixel), zodat Meta niet dubbel telt.
+──────────────────────────────────────────────────────────────── */
+var POCKETBASE_ENDPOINT = 'https://db.vdveen.online/api/collections/pbc_3420092994/records'; // id van tcbnb_info_aanvragen: blijft werken als de collectie wordt hernoemd
+
+var params = new URLSearchParams(location.search);
+var PLEK = (params.get('plek') || '').slice(0, 100);
+var UTM = {};
+['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) { UTM[k] = (params.get(k) || '').slice(0, 200); });
+var FBCLID = (params.get('fbclid') || '').slice(0, 500);
+
+var $ = function (id) { return document.getElementById(id); };
+var dagdeel = '';
+
+function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function telOk(t) { var d = t.replace(/[^\d]/g, ''); return d.length >= 9 && d.length <= 15; }
+
+/* telefoonveld stuurt de hele pagina: route-kaartje, dagdeel en knoptekst */
+function syncTel() {
+  var bel = $('telefoon').value.trim() !== '';
+  $('when').classList.toggle('open', bel);
+  $('send').textContent = bel ? 'Bel me en stuur de folder' : 'Stuur me de folder';
+  if (!bel) { dagdeel = ''; setChips(); }
+  sendHeight();
+}
+function setChips() {
+  document.querySelectorAll('#chips button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.v === dagdeel ? 'true' : 'false'); });
+}
+$('telefoon').addEventListener('input', syncTel);document.querySelectorAll('#chips button').forEach(function (b) {
+  b.addEventListener('click', function () { dagdeel = dagdeel === b.dataset.v ? '' : b.dataset.v; setChips(); });
+});
+
+$('form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var voornaam = $('voornaam').value.trim();
+  var email = $('email').value.trim();
+  var telefoon = $('telefoon').value.trim();
+  var bel = telefoon !== '';
+
+  var okMail = voornaam && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+  var okTel = !bel || telOk(telefoon);
+  $('errMail').classList.toggle('show', !okMail);
+  $('errTel').classList.toggle('show', !okTel);
+  if (!okMail || !okTel) return;
+
+  var payload = {
+    voornaam: voornaam, email: email, telefoon: telefoon,
+    route: bel ? 'bellen' : 'folder',
+    dagdeel: dagdeel,
+    nieuwsbrief: $('nieuwsbrief').checked,
+    status: 'nieuw',
+    bron: (PLEK ? PLEK + ' · ' : '') + (document.referrer || 'direct'),
+    utm_source: UTM.utm_source, utm_medium: UTM.utm_medium, utm_campaign: UTM.utm_campaign, utm_content: UTM.utm_content,
+    fbclid: FBCLID,
+    event_id: 'tcbnb-info-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10),
+    user_agent: navigator.userAgent.slice(0, 500)
+  };
+
+  var btn = $('send'); var label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Even geduld…';
+
+  function done() {
+    $('stage').innerHTML =
+      '<div class="done"><span class="eyebrow">Gelukt</span>' +
+      '<h1>Dank je, ' + esc(voornaam) + '.</h1>' +
+      (bel
+        ? '<p>We bellen je binnen een paar werkdagen' + (dagdeel ? ' in de ' + dagdeel : '') + '.</p>' +
+          '<p class="soft">De folder staat alvast in je mail, op ' + esc(email) + '.</p>'
+        : '<p>De folder staat binnen een paar minuten in je mail, op ' + esc(email) + '.</p>' +
+          '<p class="soft">Niks gezien? Kijk even bij je reclame of ongewenste mail.</p>') +
+      '</div>';
+    toOuder({ tcbnbContact: { route: payload.route, eventId: payload.event_id } });
+    toOuder({ tcbnbTop: true });
+  }
+  if (POCKETBASE_ENDPOINT.indexOf('VUL-IN') !== -1) { done(); return; } // preview
+
+  fetch(POCKETBASE_ENDPOINT, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function (r) { if (!r.ok) throw 0; done(); }).catch(function () {
+    btn.disabled = false; btn.textContent = label;
+    $('errTel').textContent = 'Versturen lukte niet. Probeer het nog een keer.'; $('errTel').classList.add('show');
+  });
+});
+
+/* koppeling met takecarebnb.org: hoogte, terugscrollen, en tcbnbContact → fbq('track','Contact',{},{eventID}) */
+function toOuder(msg) { if (window.parent !== window) window.parent.postMessage(msg, '*'); }
+function sendHeight() { toOuder({ tcbnbHeight: document.body.scrollHeight }); }
+window.addEventListener('load', sendHeight);
+window.addEventListener('resize', sendHeight);
+new MutationObserver(sendHeight).observe(document.body, { childList: true, subtree: true });
+</script>
+</body>
+</html>
